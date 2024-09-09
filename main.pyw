@@ -65,12 +65,12 @@ try:
     res = requests.get(url)
 
     if res.status_code != 200:
-        raise StatusException(f"Unexpected HTML status code: \033[1;35mCODE {str(res.status_code)}\033[00m")
+        raise StatusException(res.status_code)
 except requests.exceptions.RequestException as error:
     print(f'\n\033[1;31m (っ◞‸◟ c) An error ocurred\033[00m: ERROR {error}\n')
     exit()
 except StatusException as error:
-    print(f'\n \033[1;31m(－－ ; Exception\033[00m: {error}')
+    print(f'\n \033[1;31m(－－ ; Exception\033[00m: Unexpected HTML status code: \033[1;35mCODE {error}\033[00m')
     if error == 429: print('\n \033[3;90mToo many requests. Try again later...')
     print()
     exit()
