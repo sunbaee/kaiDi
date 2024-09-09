@@ -57,6 +57,11 @@ def GetTransDescription(tag):
 fromLang = "english"
 toLang = "portuguese"
 
+# Checks arguments
+if len(sys.argv) <= 1:
+    print("\n\033[1;31m ୧(๑•̀ᗝ•́)૭ No arguments supplied.\n\033[00m")
+    exit() 
+
 # Gets linguee url 
 url = f'https://www.linguee.com/{fromLang}-{toLang}/search?source=auto&query={sys.argv[1]}'
 
