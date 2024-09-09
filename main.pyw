@@ -71,7 +71,7 @@ except requests.exceptions.RequestException as error:
     exit()
 except StatusException as error:
     print(f'\n \033[1;31m(－－ ; Exception\033[00m: Unexpected HTML status code: \033[1;35mCODE {error}\033[00m')
-    if error == 429: print('\n \033[3;90mToo many requests. Try again later...')
+    if str(error) == '429': print('\n \033[3;90mToo many requests. Try again later...')
     print()
     exit()
 
