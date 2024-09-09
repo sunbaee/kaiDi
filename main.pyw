@@ -10,9 +10,9 @@ class Description:
         self.title = title.text
         self.wordtype = wordtype
 
-    def Display(self, titleColor='\033[00m', wordtypeColor='\033[00m'):
+    def Display(self, titleColor='\033[00m', wordtypeColor='\033[00m', atStart='', atEnd='\n'):
         wordTypeStr = f'{wordtypeColor}({self.wordtype.text})\033[00m' if self.wordtype else ''
-        print(f'   {titleColor}{self.title}\033[00m {wordTypeStr}')
+        print(f'{atStart}{titleColor}{self.title}\033[00m {wordTypeStr}', end=atEnd)
 
 class Translation:
     def __init__(self, description, exampleTexts):
@@ -20,10 +20,10 @@ class Translation:
         self.exampleTexts = exampleTexts
     
     def Display(self):
-        self.description.Display('\033[1;90m', '\033[2;37m')
+        self.description.Display('\033[0;37m', '\033[3;90m', '\n   ')
 
         for example in self.exampleTexts:
-            print(f'     \033[1;34m{example.text}')
+            print(f'     \033[0;34m{example.text.strip()}')
 
 class Lemma:
     def __init__(self, description, transInfos, lessCommons):
@@ -32,16 +32,20 @@ class Lemma:
         self.transInfos = transInfos
     
     def Display(self):
-        self.description.Display('\033[2;96m', '\033[1;37m')
+        self.description.Display('\033[1;32m', '\033[3;90m', '\n ', '')
 
         for info in self.transInfos:
             info.Display()
         
         if len(self.lessCommons) <= 0: return
         
-        print('\033[2;36mLess common: \033[00m')
-        for lessCommon in self.lessCommons:
-            lessCommon.Display()
+        print('\n \033[3;32mLess common: \033[00m\n   ', end='')
+        for i, lessCommon in enumerate(self.lessCommons):
+            if i == len(self.lessCommons) - 1:
+                lessCommon.Display('\033[0;37m', '\033[3;90m', '')
+                continue
+
+            lessCommon.Display('\033[0;37m', '\033[3;90m', '', ' - ')
 
 def GetTransDescription(tag):
     # Gets description from a translation class
@@ -61,12 +65,14 @@ try:
     res = requests.get(url)
 
     if res.status_code != 200:
-        raise StatusException(f"Unexpected HTML status code: CODE \033[1;35m{str(res.status_code)}\033[00m")
+        raise StatusException(f"Unexpected HTML status code: \033[1;35mCODE {str(res.status_code)}\033[00m")
 except requests.exceptions.RequestException as error:
-    print(f'\033[1;31m (っ◞‸◟ c) An error ocurred\033[00m: ERROR {error}')
+    print(f'\n\033[1;31m (っ◞‸◟ c) An error ocurred\033[00m: ERROR {error}\n')
     exit()
 except StatusException as error:
-    print(f'\033[1;31m ( ꩜ ᯅ ꩜) Exception\033[00m: {error}')
+    print(f'\n \033[1;31m(－－ ; Exception\033[00m: {error}')
+    if error == 429: print('\n \033[3;90mToo many requests. Try again later...')
+    print()
     exit()
 
 soup = BeautifulSoup(res.text, 'lxml')
@@ -95,7 +101,7 @@ for lemma in lemmas:
     transInfos = []
     for trans in translations:
         # Gets text examples
-        exampleTexts = trans.select('.example_lines > .example > .tag_e > span:not(.tag_e_end)')
+        exampleTexts = trans.select('.example_lines > .example > .tag_e > span:not(.tag_e_end):not(.dash)')
 
         transInfos.append(Translation(GetTransDescription(trans), exampleTexts))
 
@@ -104,3 +110,5 @@ for lemma in lemmas:
 
 for info in lemmaInfos:
     info.Display()
+
+print()
