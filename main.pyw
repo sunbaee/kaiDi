@@ -54,8 +54,10 @@ def GetTransDescription(tag):
     
     return Description(titleArr[0], None if len(wordtypeArr) <= 0 else wordtypeArr[0])
 
-fromLang = "english"
-toLang = "portuguese"
+sourceLang = "portuguese"
+dotDomain = '.com.br'
+
+transLang = "french"
 
 # Checks arguments
 if len(sys.argv) <= 1:
@@ -63,7 +65,7 @@ if len(sys.argv) <= 1:
     exit() 
 
 # Gets linguee url 
-url = f'https://www.linguee.com/{fromLang}-{toLang}/search?source=auto&query={sys.argv[1]}'
+url = f'https://www.linguee{dotDomain}/{sourceLang}-{transLang}/search?source=auto&query={sys.argv[1]}'
 
 # Handle requests and errors
 try: 
