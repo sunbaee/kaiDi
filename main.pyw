@@ -1,9 +1,14 @@
 from bs4 import BeautifulSoup;
 import requests;
+import json;
 import sys;
+import re;
 
+# Custom exception
 class StatusException(Exception):
     pass
+
+# Classes from scraping
 
 class Description:
     def __init__(self, title, wordtype):
@@ -54,15 +59,66 @@ def GetTransDescription(tag):
     
     return Description(titleArr[0], None if len(wordtypeArr) <= 0 else wordtypeArr[0])
 
-sourceLang = "portuguese"
-dotDomain = '.com.br'
+# Messages
 
-transLang = "french"
+def ExitMSG(message):
+    print(f"\n {message}\n")
+    exit()
+
+def MissingArgument(customMessage='argument'):
+    ExitMSG(f"\n \033[1;31m ୧(๑•̀ᗝ•́)૭ No {customMessage} supplied.\n\033[00m")
+
+def Help():
+    ExitMSGprint("this is the help function")
 
 # Checks arguments
 if len(sys.argv) <= 1:
-    print("\n\033[1;31m ୧(๑•̀ᗝ•́)૭ No arguments supplied.\n\033[00m")
-    exit() 
+    MissingArgument()
+
+saveTranslation = False
+
+# Command line options
+for i, argument in enumerate(sys.argv[1:]):
+    # Get options
+    if argument[0] == '-' and len(argument) >= 2: 
+        match argument[1]:
+            # Shows help message
+            case 'h': Help()
+            # Shows log of translations
+            case 'l': ExitMSG('log')
+            # Changes language
+            case 'c':
+                if len(sys.argv) <= i + 2: MissingArgument('language')
+                newTransLang = sys.argv[i + 2].lower()
+
+                with open('config.json', "r+") as file:
+                    data = json.load(file)
+
+                    data['translation_language'] = newTransLang
+                    file.seek(0)
+                    json.dump(data, file)
+                    file.truncate()
+
+                print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The language was changed to \033[1;00m{newTransLang}.\033[00m')
+
+                if (sys.argv[1][0] == '-'): print(); exit()
+            # Translates block of text
+            case 't': print('text')
+            # Saves translation to be used later
+            case 's': saveTranslation = True; print("saving")
+            # Default message
+            case _: ExitMSG("\n\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m\n")
+
+exit()
+
+# Get values from json file
+with open("config.json", "r") as file:
+    jsonValues = json.load(file)
+
+sourceLang = jsonValues['source_language']
+transLang = jsonValues['translation_language']
+
+dotDomain = jsonValues['linguee_domain']
 
 # Gets linguee url 
 url = f'https://www.linguee{dotDomain}/{sourceLang}-{transLang}/search?source=auto&query={sys.argv[1]}'
@@ -89,9 +145,9 @@ lemmas = soup.select('.exact > .lemma:not(.singleline) > div')
 
  # If there's no titles, no results where found
 if len(lemmas) <= 0:
-    print("\033[1;31m No results where found. \033[00m")
-    exit()
+    ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
 
+# Stores lemmas
 lemmaInfos = []
 for lemma in lemmas:
     # Creates descrition with title and wordtype search
@@ -114,6 +170,15 @@ for lemma in lemmas:
 
     # Add everything to array
     lemmaInfos.append(Lemma(description, transInfos, lessCommonInfo))
+
+# Saves to log history
+with open('config.json', "r+") as file:
+    data = json.load(file)
+
+    data['translation_language'] = newTransLang
+    file.seek(0)
+    json.dump(data, file)
+    file.truncate()
 
 for info in lemmaInfos:
     info.Display()
