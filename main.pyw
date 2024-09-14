@@ -145,12 +145,12 @@ def Help():
     print("              (˶˃ ᵕ ˂˶) .ᐟ.ᐟ \n")
     print(" Syntax: trs yourwordhere [options]\n")
     print(" Options: ")
-    print("  -t                : Translates a chunck of text instead of a single word")
-    print("  -s                : Saves the translation to be used later.")
-    print("  -c lang:(src-dom) : Change the translated language.")
-    print("  -C                : Displays configuration file.")
-    print("  -l                : Shows log of translations.")
-    print("  -h                : Shows this help message.\n")
+    print("  -t          : Translates a chunck of text instead of a single word")
+    print("  -s          : Saves the translation to be used later.")
+    print("  -C          : Displays options from the config file")
+    print("  -c prop=arg : Changes config file options.")
+    print("  -l          : Shows log of translations.")
+    print("  -h          : Shows this help message.\n")
     exit()
 
 # Checks arguments
@@ -169,29 +169,39 @@ for i, argument in enumerate(sys.argv[1:]):
             case 'h': Help()
             # Shows log of translations
             case 'l': ExitMSG('log')
-            # Changes language
+            # Changes config file
             case 'c':
                 if len(sys.argv) <= i + 2: MissingArgument('language')
-                newTransLang = sys.argv[i + 2].lower()
+                optionArg = sys.argv[i + 2]
+
+                sepIndex = optionArg.find('=')
+                if sepIndex == -1:
+                    sepIndex = optionArg.find(':')
+                    if sepIndex == -1: ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Incorrect syntax.\033[00m")
+
+                    properties = optionArg.split(':')
+                else:
+                    strsArr = optionArg.split('=')
 
                 with open('config.json', "r+") as file:
                     config = json.load(file)
 
-                    config['translation_language'] = newTransLang
+                    config[strsArr[0]] = strsArr[1]
                     file.seek(0)
                     json.dump(config, file)
                     file.truncate()
 
-                print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The language was changed to \033[1;00m{newTransLang}.\033[00m')
+                print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The property \033[3;37m"{strsArr[0]}"\033[00m was changed to \033[3;37m"{strsArr[1]}"\033[00m.')
 
                 if (search[0] == '-'): print(); exit()
-            # Display configuration
+            # Display options from the configuration file
             case 'C':
                 config = OpenConfig()
 
-                print(f'\n \033[1;33mSource Language:\033[00m {config['source_language']}')
-                print(  f' \033[1;33mTranslated language:\033[00m {config['translation_language']}\n')
-                print(  f' \033[1;35mDomain:\033[00m {config['linguee_domain']}\n')
+                print(f'\n \033[1;33msourceLanguage:\033[00m {config['sourceLanguage']}')
+                print(  f' \033[1;33mtranslate:\033[00m {config['translate']}\n')
+                print(  f' \033[1;34mnumberLogs:\033[00m {config['numberLogs']}\n')
+                print(  f' \033[1;35mdomain:\033[00m {config['domain']}\n')
 
                 exit()
             # Translates block of text
@@ -204,9 +214,9 @@ for i, argument in enumerate(sys.argv[1:]):
 # Get values from json file
 config = OpenConfig()
 
-dotDomain = config['linguee_domain']
-sourceLang = config['source_language']
-transLang = config['translation_language']
+dotDomain = config['domain']
+sourceLang = config['sourceLanguage']
+transLang = config['translate']
 
 # Gets linguee url 
 url = f'https://www.linguee{dotDomain}/{sourceLang}-{transLang}/search?source=auto&query={search}'
@@ -248,4 +258,4 @@ print()
 WriteData('logs', search, lemmaInfos)
 
 # Saves to saved section (-s option)
-WriteData('saved', search, lemmaInfos)
+if saveTranslation: WriteData('saved', search, lemmaInfos)
