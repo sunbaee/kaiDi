@@ -1,45 +1,51 @@
 from bs4 import BeautifulSoup;
 import requests;
+import shelve;
 import json;
 import sys;
-import re;
 
 # Custom exception
 class StatusException(Exception):
     pass
 
-# Classes from scraping
+# Classes for scraping
 
 class Description:
     def __init__(self, title, wordtype):
         self.title = title.text
-        self.wordtype = wordtype
+        self.wordtype = wordtype.text if wordtype else ''
 
     def Display(self, titleColor='\033[00m', wordtypeColor='\033[00m', atStart='', atEnd='\n'):
-        wordTypeStr = f'{wordtypeColor}({self.wordtype.text})\033[00m' if self.wordtype else ''
+        wordTypeStr = f'{wordtypeColor}({self.wordtype})\033[00m' if self.wordtype != '' else ''
         print(f'{atStart}{titleColor}{self.title}\033[00m {wordTypeStr}', end=atEnd)
 
 class Translation:
     def __init__(self, description, exampleTexts):
         self.description = description
-        self.exampleTexts = exampleTexts
+        self.exampleTexts = list(map(lambda l: l.text, exampleTexts))
     
     def Display(self):
         self.description.Display('\033[0;37m', '\033[3;90m', '\n   ')
 
         for example in self.exampleTexts:
-            print(f'     \033[0;34m{example.text.strip()}')
+            print(f'     \033[0;34m{example.strip()}\033[00m')
+
+    def Dict(self):
+        return {
+            'description': self.description.__dict__,
+            'examples': self.exampleTexts
+        }
 
 class Lemma:
-    def __init__(self, description, transInfos, lessCommons):
+    def __init__(self, description, translations, lessCommons):
         self.description = description
         self.lessCommons = lessCommons
-        self.transInfos = transInfos
+        self.translations = translations
     
     def Display(self):
         self.description.Display('\033[1;32m', '\033[3;90m', '\n ', '')
 
-        for info in self.transInfos:
+        for info in self.translations:
             info.Display()
         
         if len(self.lessCommons) <= 0: return
@@ -51,6 +57,36 @@ class Lemma:
                 continue
 
             lessCommon.Display('\033[0;37m', '\033[3;90m', '', ' - ')
+
+    def Dict(self):
+        transDictArr = []
+        for trans in self.translations:
+            transDictArr.append(trans.Dict())
+
+        lessCommonDictArr = []
+        for lc in self.lessCommons:
+            lessCommonDictArr.append(lc.__dict__)
+
+        return {
+            'description': self.description.__dict__,
+            'translations': transDictArr,
+            'lessCommons': lessCommonDictArr
+        }
+
+class Page:
+    def __init__(self, search, lemmas):
+        self.search = search
+        self.lemmas = lemmas
+
+    def Dict(self):
+        lemmasDict = []
+        for lemma in self.lemmas:
+            lemmasDict.append(lemma.Dict())
+
+        return {
+            "search": self.search,
+            "lemmas": lemmasDict
+        }
 
 def GetTransDescription(tag):
     # Gets description from a translation class
@@ -66,15 +102,26 @@ def ExitMSG(message):
     exit()
 
 def MissingArgument(customMessage='argument'):
-    ExitMSG(f"\n \033[1;31m ୧(๑•̀ᗝ•́)૭ No {customMessage} supplied.\n\033[00m")
+    ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ No {customMessage} supplied.\033[00m")
 
 def Help():
-    ExitMSGprint("this is the help function")
+    print("\n Description: A script that translates things directly from the terminal.")
+    print("              (˶˃ ᵕ ˂˶) .ᐟ.ᐟ \n")
+    print(" Syntax: trs yourwordhere [options]\n")
+    print(" Options: ")
+    print("  -t                : Translates a chunck of text instead of a single word")
+    print("  -s                : Saves the translation to be used later.")
+    print("  -c lang:(src-dom) : Change the translated language.")
+    print("  -C                : Displays configuration file.")
+    print("  -l                : Shows log of translations.")
+    print("  -h                : Shows this help message.\n")
+    exit()
 
 # Checks arguments
 if len(sys.argv) <= 1:
     MissingArgument()
 
+search = sys.argv[1]
 saveTranslation = False
 
 # Command line options
@@ -92,36 +139,33 @@ for i, argument in enumerate(sys.argv[1:]):
                 newTransLang = sys.argv[i + 2].lower()
 
                 with open('config.json', "r+") as file:
-                    data = json.load(file)
+                    config = json.load(file)
 
-                    data['translation_language'] = newTransLang
+                    config['translation_language'] = newTransLang
                     file.seek(0)
-                    json.dump(data, file)
+                    json.dump(config, file)
                     file.truncate()
 
                 print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The language was changed to \033[1;00m{newTransLang}.\033[00m')
 
-                if (sys.argv[1][0] == '-'): print(); exit()
+                if (search[0] == '-'): print(); exit()
             # Translates block of text
             case 't': print('text')
             # Saves translation to be used later
-            case 's': saveTranslation = True; print("saving")
+            case 's': saveTranslation = True;
             # Default message
             case _: ExitMSG("\n\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m\n")
 
-exit()
-
 # Get values from json file
 with open("config.json", "r") as file:
-    jsonValues = json.load(file)
+    config = json.load(file)
 
-sourceLang = jsonValues['source_language']
-transLang = jsonValues['translation_language']
-
-dotDomain = jsonValues['linguee_domain']
+dotDomain = config['linguee_domain']
+sourceLang = config['source_language']
+transLang = config['translation_language']
 
 # Gets linguee url 
-url = f'https://www.linguee{dotDomain}/{sourceLang}-{transLang}/search?source=auto&query={sys.argv[1]}'
+url = f'https://www.linguee{dotDomain}/{sourceLang}-{transLang}/search?source=auto&query={search}'
 
 # Handle requests and errors
 try: 
@@ -171,16 +215,17 @@ for lemma in lemmas:
     # Add everything to array
     lemmaInfos.append(Lemma(description, transInfos, lessCommonInfo))
 
-# Saves to log history
-with open('config.json', "r+") as file:
-    data = json.load(file)
-
-    data['translation_language'] = newTransLang
-    file.seek(0)
-    json.dump(data, file)
-    file.truncate()
-
+# Displays result
 for info in lemmaInfos:
     info.Display()
 
 print()
+
+# Saves to log history
+with shelve.open('data.db', writeback=True) as dataFile:
+    # Doesnt append to database, it is overwriting it
+    dataFile['logs'] = []
+    dataFile['logs'].append(Page(search, lemmaInfos).Dict())
+
+    dataFile.sync()
+    print(dataFile['logs'])
