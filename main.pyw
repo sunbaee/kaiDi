@@ -3,6 +3,7 @@ import requests;
 import shelve;
 import json;
 import sys;
+import os;
 
 # Custom exception
 class StatusException(Exception):
@@ -95,6 +96,41 @@ def GetTransDescription(tag):
     
     return Description(titleArr[0], None if len(wordtypeArr) <= 0 else wordtypeArr[0])
 
+def GetTranslation(trans):
+        # Gets text examples
+        exampleTexts = trans.select('.example_lines > .example > .tag_e > span:not(.tag_e_end):not(.dash)')
+
+        return Translation(GetTransDescription(trans), exampleTexts)
+
+def GetLemma(lemma):
+    # Creates descrition with title and wordtype search
+    description = Description(lemma.select('h2 .dictLink')[0], lemma.select('h2 .tag_wordtype')[0])
+
+    # Gets less common translations
+    lessCommons = lemma.select('.lemma_content .translation_group .translation')
+    lessCommonInfo = list(map(GetTransDescription, lessCommons))
+
+    # Gets common translations
+    translations = lemma.select('.lemma_content .translation_lines > .translation')
+    transInfos = list(map(GetTranslation, translations))
+
+    # Add everything to array
+    return Lemma(description, transInfos, lessCommonInfo)
+
+# Writing/Reading files
+def WriteData(section, search, lemmaInfos):
+    with shelve.open('data.db', writeback=True) as dataFile:
+        # Doesnt append to database, it is overwriting it
+        dataFile[f'{section}'] = []
+        dataFile[f'{section}'].append(Page(search, lemmaInfos).Dict())
+
+        dataFile.sync()
+        #print(dataFile[f'{section}'])
+
+def OpenConfig():
+    with open("config.json", "r") as file:
+        return json.load(file)
+
 # Messages
 
 def ExitMSG(message):
@@ -149,6 +185,15 @@ for i, argument in enumerate(sys.argv[1:]):
                 print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The language was changed to \033[1;00m{newTransLang}.\033[00m')
 
                 if (search[0] == '-'): print(); exit()
+            # Display configuration
+            case 'C':
+                config = OpenConfig()
+
+                print(f'\n \033[1;33mSource Language:\033[00m {config['source_language']}')
+                print(  f' \033[1;33mTranslated language:\033[00m {config['translation_language']}\n')
+                print(  f' \033[1;35mDomain:\033[00m {config['linguee_domain']}\n')
+
+                exit()
             # Translates block of text
             case 't': print('text')
             # Saves translation to be used later
@@ -157,8 +202,7 @@ for i, argument in enumerate(sys.argv[1:]):
             case _: ExitMSG("\n\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m\n")
 
 # Get values from json file
-with open("config.json", "r") as file:
-    config = json.load(file)
+config = OpenConfig()
 
 dotDomain = config['linguee_domain']
 sourceLang = config['source_language']
@@ -192,28 +236,7 @@ if len(lemmas) <= 0:
     ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
 
 # Stores lemmas
-lemmaInfos = []
-for lemma in lemmas:
-    # Creates descrition with title and wordtype search
-    description = Description(lemma.select('h2 .dictLink')[0], lemma.select('h2 .tag_wordtype')[0])
-
-    # Gets less common translations
-    lessCommons = lemma.select('.lemma_content .translation_group .translation')
-    lessCommonInfo = []
-    for lessCommon in lessCommons:
-        lessCommonInfo.append(GetTransDescription(lessCommon))
-
-    # Gets common translations
-    translations = lemma.select('.lemma_content .translation_lines > .translation')
-    transInfos = []
-    for trans in translations:
-        # Gets text examples
-        exampleTexts = trans.select('.example_lines > .example > .tag_e > span:not(.tag_e_end):not(.dash)')
-
-        transInfos.append(Translation(GetTransDescription(trans), exampleTexts))
-
-    # Add everything to array
-    lemmaInfos.append(Lemma(description, transInfos, lessCommonInfo))
+lemmaInfos = list(map(GetLemma, lemmas))
 
 # Displays result
 for info in lemmaInfos:
@@ -222,10 +245,7 @@ for info in lemmaInfos:
 print()
 
 # Saves to log history
-with shelve.open('data.db', writeback=True) as dataFile:
-    # Doesnt append to database, it is overwriting it
-    dataFile['logs'] = []
-    dataFile['logs'].append(Page(search, lemmaInfos).Dict())
+WriteData('logs', search, lemmaInfos)
 
-    dataFile.sync()
-    print(dataFile['logs'])
+# Saves to saved section (-s option)
+WriteData('saved', search, lemmaInfos)
