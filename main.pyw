@@ -147,7 +147,7 @@ def Help():
     print(" Options: ")
     print("  -t          : Translates a chunck of text instead of a single word")
     print("  -s          : Saves the translation to be used later.")
-    print("  -C          : Displays options from the config file")
+    print("  -d          : Displays options from the config file")
     print("  -c prop=arg : Changes config file options.")
     print("  -l          : Shows log of translations.")
     print("  -h          : Shows this help message.\n")
@@ -171,34 +171,59 @@ for i, argument in enumerate(sys.argv[1:]):
             case 'l': ExitMSG('log')
             # Changes config file
             case 'c':
-                if len(sys.argv) <= i + 2: MissingArgument('language')
-                optionArg = sys.argv[i + 2]
+                # Looks for option arguments
+                if len(sys.argv) <= i + 2: MissingArgument('option argument')
 
-                sepIndex = optionArg.find('=')
-                if sepIndex == -1:
-                    sepIndex = optionArg.find(':')
-                    if sepIndex == -1: ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Incorrect syntax.\033[00m")
+                propStrs = ['sourceLanguage', 'translate', 'numberLogs', 'domain']
+                properties = []    
+                
+                # Loops through option arguments
+                for optArg in sys.argv[i+2:]:
+                    if optArg[0] == '-': break;
 
-                    properties = optionArg.split(':')
-                else:
-                    strsArr = optionArg.split('=')
+                    if optArg.find('=') != -1:
+                        # Separates into list with propertyName and propertyArgument
+                        prop = optArg.split('=')
+                        # Checks if the propertyName matches any property available in propStrs
+                        
+                        # Creates list with booleans depending 
+                        # if the propertyName matches one of the strings in propStrs,
+                        # if no string matches the propertyName, than the propertyName inserted is invalid.
+                        correctStr = False
+                        for k in list(map(lambda x: prop[0] == x, propStrs)):
+                            if k: correctStr = True
+                        if not correctStr: ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Incorrect config option name. Use -d to see options names.\033[00m")
+                        
+                        properties.append(prop)
+                    else:
+                        # Fast syntax using ':' (only insert arguments)
+                        if optArg.find(':') == -1: ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Incorrect syntax.\033[00m")
+
+                        for i, arg in enumerate(optArg.split(':')):
+                            if arg == '': continue;
+
+                            properties.append([propStrs[i], arg])
 
                 with open('config.json', "r+") as file:
                     config = json.load(file)
 
-                    config[strsArr[0]] = strsArr[1]
+                    for prop in properties: 
+                        config[prop[0]] = prop[1]
+
                     file.seek(0)
                     json.dump(config, file)
                     file.truncate()
 
-                print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The property \033[3;37m"{strsArr[0]}"\033[00m was changed to \033[3;37m"{strsArr[1]}"\033[00m.')
+                # Displays property change feedback
+                print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The following properties were changed: \n')
+                for i, p in enumerate(properties): print(f'   \033[1;37m{i + 1}.\033[00m\033[3;37m"{p[0]}"\033[00m was changed to \033[3;37m"{p[1]}"\033[00m.')
 
                 if (search[0] == '-'): print(); exit()
             # Display options from the configuration file
-            case 'C':
+            case 'd':
                 config = OpenConfig()
-
-                print(f'\n \033[1;33msourceLanguage:\033[00m {config['sourceLanguage']}')
+                print(f'\n \033[1;39m(˶ ˆ ꒳ˆ˵) Displaying useful information:\033[00m\n')
+                print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage']}')
                 print(  f' \033[1;33mtranslate:\033[00m {config['translate']}\n')
                 print(  f' \033[1;34mnumberLogs:\033[00m {config['numberLogs']}\n')
                 print(  f' \033[1;35mdomain:\033[00m {config['domain']}\n')
@@ -209,7 +234,7 @@ for i, argument in enumerate(sys.argv[1:]):
             # Saves translation to be used later
             case 's': saveTranslation = True;
             # Default message
-            case _: ExitMSG("\n\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m\n")
+            case _: ExitMSG("\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m")
 
 # Get values from json file
 config = OpenConfig()
@@ -228,7 +253,7 @@ try:
     if res.status_code != 200:
         raise StatusException(res.status_code)
 except requests.exceptions.RequestException as error:
-    print(f'\n\033[1;31m (っ◞‸◟ c) An error ocurred\033[00m: ERROR {error}\n')
+    print(f'\n\033[1;31m (っ◞‸◟ c) An error ocurred:\033[00m\n\n   {error}\n')
     exit()
 except StatusException as error:
     print(f'\n \033[1;31m(－－ ; Exception\033[00m: Unexpected HTML status code: \033[1;35mCODE {error}\033[00m')
