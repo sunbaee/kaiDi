@@ -75,18 +75,20 @@ class Lemma:
         }
 
 class Page:
-    def __init__(self, search, lemmas):
+    def __init__(self, search, lemmas, srcLanguage, trsLanguage):
         self.search = search
         self.lemmas = lemmas
+        self.srcLanguage = srcLanguage
+        self.trsLanguage = trsLanguage
 
     def Dict(self):
-        lemmasDict = []
-        for lemma in self.lemmas:
-            lemmasDict.append(lemma.Dict())
+        lemmasDict = list(map(lambda l: l.Dict(), self.lemmas))
 
         return {
             "search": self.search,
-            "lemmas": lemmasDict
+            "lemmas": lemmasDict,
+            "source": self.srcLanguage,
+            "translated": self.trsLanguage
         }
 
 def GetTransDescription(tag):
@@ -118,14 +120,18 @@ def GetLemma(lemma):
     return Lemma(description, transInfos, lessCommonInfo)
 
 # Writing/Reading files
-def WriteData(section, search, lemmaInfos):
+def WriteData(section, search, lemmaInfos, sourceLanguage, translatedLanguage):
     with shelve.open('data.db', writeback=True) as dataFile:
         # Doesnt append to database, it is overwriting it
         dataFile[f'{section}'] = []
-        dataFile[f'{section}'].append(Page(search, lemmaInfos).Dict())
+        dataFile[f'{section}'].append(Page(search, lemmaInfos, sourceLanguage, translatedLanguage).Dict())
 
         dataFile.sync()
         #print(dataFile[f'{section}'])
+
+def GetData(section):
+    with shelve.open('data.db') as dataFile:
+        return dataFile[section]
 
 def OpenConfig():
     with open("config.json", "r") as file:
@@ -146,10 +152,10 @@ def Help():
     print(" Syntax: trs yourwordhere [options]\n")
     print(" Options: ")
     print("  -t          : Translates a chunck of text instead of a single word")
+    print("  -l          : Shows log of translations and saved translations.")
     print("  -s          : Saves the translation to be used later.")
     print("  -d          : Displays options from the config file")
     print("  -c prop=arg : Changes config file options.")
-    print("  -l          : Shows log of translations.")
     print("  -h          : Shows this help message.\n")
     exit()
 
@@ -168,7 +174,17 @@ for i, argument in enumerate(sys.argv[1:]):
             # Shows help message
             case 'h': Help()
             # Shows log of translations
-            case 'l': ExitMSG('log')
+            case 'l': 
+                logs = GetData('logs')
+                print(f'\n \033[1;35m(≧∇≦) Displaying your logs:\033[00m\n')
+                for page in logs: 
+                    print(f"   \033[1;00m1. \033[00m\033[3m{page['search']} \033[00m\033[2m|\033[00m {page['source']} - {page['translated']}\033[00m")
+
+                saved = GetData('saved')
+                print(f'\n \033[1;35m(≧∇≦) Displaying your saved translations:\033[00m\n')
+                for page in saved: print(f"   \033[1;00m1. \033[00m\033[3m{page['search']} \033[00m\033[2m|\033[00m {page['source']} - {page['translated']}\033[00m")
+                
+                print(); exit()
             # Changes config file
             case 'c':
                 # Looks for option arguments
@@ -203,7 +219,8 @@ for i, argument in enumerate(sys.argv[1:]):
                             if arg == '': continue;
 
                             properties.append([propStrs[i], arg])
-
+                
+                # Updates config file
                 with open('config.json', "r+") as file:
                     config = json.load(file)
 
@@ -222,7 +239,7 @@ for i, argument in enumerate(sys.argv[1:]):
             # Display options from the configuration file
             case 'd':
                 config = OpenConfig()
-                print(f'\n \033[1;39m(˶ ˆ ꒳ˆ˵) Displaying useful information:\033[00m\n')
+                print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[3mDisplaying useful information:\033[00m\n')
                 print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage']}')
                 print(  f' \033[1;33mtranslate:\033[00m {config['translate']}\n')
                 print(  f' \033[1;34mnumberLogs:\033[00m {config['numberLogs']}\n')
@@ -280,7 +297,7 @@ for info in lemmaInfos:
 print()
 
 # Saves to log history
-WriteData('logs', search, lemmaInfos)
+WriteData('logs', search, lemmaInfos, sourceLang, transLang)
 
 # Saves to saved section (-s option)
-if saveTranslation: WriteData('saved', search, lemmaInfos)
+if saveTranslation: WriteData('saved', search, lemmaInfos, sourceLang, transLang)
