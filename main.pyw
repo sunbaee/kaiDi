@@ -3,7 +3,6 @@ import requests;
 import shelve;
 import json;
 import sys;
-import os;
 
 # Custom exception
 class StatusException(Exception):
@@ -26,10 +25,10 @@ class Translation:
         self.exampleTexts = list(map(lambda l: l.text, exampleTexts))
     
     def Display(self):
-        self.description.Display('\033[0;37m', '\033[3;90m', '\n   ')
+        self.description.Display('\033[0;37m', '\033[3;90m', '\n     ')
 
         for example in self.exampleTexts:
-            print(f'     \033[0;34m{example.strip()}\033[00m')
+            print(f'       \033[0;34m{example.strip()}\033[00m')
 
     def Dict(self):
         return {
@@ -44,14 +43,14 @@ class Lemma:
         self.translations = translations
     
     def Display(self):
-        self.description.Display('\033[1;32m', '\033[3;90m', '\n ', '')
+        self.description.Display('\033[1;32m', '\033[3;90m', '\n   ', '')
 
         for info in self.translations:
             info.Display()
         
         if len(self.lessCommons) <= 0: return
         
-        print('\n \033[3;32mLess common: \033[00m\n   ', end='')
+        print('\n   \033[3;32mLess common: \033[00m\n     ', end='')
         for i, lessCommon in enumerate(self.lessCommons):
             if i == len(self.lessCommons) - 1:
                 lessCommon.Display('\033[0;37m', '\033[3;90m', '')
@@ -119,6 +118,23 @@ def GetLemma(lemma):
     # Add everything to array
     return Lemma(description, transInfos, lessCommonInfo)
 
+# Connect to url
+def SoupConnect(url):
+    # Handle requests and errors
+    try: 
+        res = requests.get(url)
+
+        if res.status_code != 200: raise StatusException(res.status_code)
+    except requests.exceptions.RequestException as error:
+        ExitMSG(f'\033[1;31m (っ◞‸◟ c) An error ocurred:\033[00m\n\n   {error}')
+    except StatusException as error:
+        print(f'\n \033[1;31m(－－ ; Exception\033[00m: Unexpected HTML status code: \033[1;35mCODE {error}\033[00m')
+        if str(error) == '429': print('\n \033[3;90mToo many requests. Try again later...\033[00m')
+        print()
+        exit()
+    
+    return BeautifulSoup(res.text, 'lxml')
+
 # Writing/Reading files
 def WriteData(section, search, lemmaInfos, sourceLanguage, translatedLanguage):
     with shelve.open('data.db', writeback=True) as dataFile:
@@ -151,7 +167,6 @@ def Help():
     print("              (˶˃ ᵕ ˂˶) .ᐟ.ᐟ \n")
     print(" Syntax: trs yourwordhere [options]\n")
     print(" Options: ")
-    print("  -t          : Translates a chunck of text instead of a single word")
     print("  -l          : Shows log of translations and saved translations.")
     print("  -s          : Saves the translation to be used later.")
     print("  -d          : Displays options from the config file")
@@ -163,13 +178,15 @@ def Help():
 if len(sys.argv) <= 1:
     MissingArgument()
 
-search = sys.argv[1]
+search = []
 saveTranslation = False
+usingOptions = False
 
 # Command line options
 for i, argument in enumerate(sys.argv[1:]):
     # Get options
-    if argument[0] == '-' and len(argument) >= 2: 
+    if argument[0] == '-' and len(argument) >= 2:
+        usingOptions = True
         match argument[1]:
             # Shows help message
             case 'h': Help()
@@ -235,7 +252,7 @@ for i, argument in enumerate(sys.argv[1:]):
                 print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The following properties were changed: \n')
                 for i, p in enumerate(properties): print(f'   \033[1;37m{i + 1}.\033[00m\033[3;37m"{p[0]}"\033[00m was changed to \033[3;37m"{p[1]}"\033[00m.')
 
-                if (search[0] == '-'): print(); exit()
+                if (len(search) == 0): print(); exit()
             # Display options from the configuration file
             case 'd':
                 config = OpenConfig()
@@ -246,13 +263,14 @@ for i, argument in enumerate(sys.argv[1:]):
                 print(  f' \033[1;35mdomain:\033[00m {config['domain']}\n')
 
                 exit()
-            # Translates block of text
-            case 't': print('text')
             # Saves translation to be used later
             case 's': saveTranslation = True;
             # Default message
             case _: ExitMSG("\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m")
-
+    
+    # Get all arguments before the first option (all text to be translated)
+    if not usingOptions: search.append(argument);
+    
 # Get values from json file
 config = OpenConfig()
 
@@ -260,25 +278,27 @@ dotDomain = config['domain']
 sourceLang = config['sourceLanguage']
 transLang = config['translate']
 
+if len(search) > 1:
+    # Transforms array in string
+    searchText = ''
+    for i, word in enumerate(search): 
+        fStr = f'{word} '
+        if i == len(search) - 1: fStr = word;
+
+        searchText += fStr
+    
+    deeplUrl = f'https://www.deepl.com/en/translator#en/fr/{searchText}'
+
+    soup = SoupConnect(deeplUrl)
+    #[aria-labelledby]="translation-target-heading"
+    textTranslation = soup.select('div')
+
+    print(textTranslation)
+    exit()
+
 # Gets linguee url 
-url = f'https://www.linguee{dotDomain}/{sourceLang}-{transLang}/search?source=auto&query={search}'
-
-# Handle requests and errors
-try: 
-    res = requests.get(url)
-
-    if res.status_code != 200:
-        raise StatusException(res.status_code)
-except requests.exceptions.RequestException as error:
-    print(f'\n\033[1;31m (っ◞‸◟ c) An error ocurred:\033[00m\n\n   {error}\n')
-    exit()
-except StatusException as error:
-    print(f'\n \033[1;31m(－－ ; Exception\033[00m: Unexpected HTML status code: \033[1;35mCODE {error}\033[00m')
-    if str(error) == '429': print('\n \033[3;90mToo many requests. Try again later...\033[00m')
-    print()
-    exit()
-
-soup = BeautifulSoup(res.text, 'lxml')
+lingueeUrl = f'https://www.linguee{dotDomain}/{sourceLang}-{transLang}/search?source=auto&query={search[0]}'
+soup = SoupConnect(lingueeUrl)
 
 # Gets lemmas (chunks of text)
 lemmas = soup.select('.exact > .lemma:not(.singleline) > div')
@@ -297,7 +317,7 @@ for info in lemmaInfos:
 print()
 
 # Saves to log history
-WriteData('logs', search, lemmaInfos, sourceLang, transLang)
+WriteData('logs', search[0], lemmaInfos, sourceLang, transLang)
 
 # Saves to saved section (-s option)
-if saveTranslation: WriteData('saved', search, lemmaInfos, sourceLang, transLang)
+if saveTranslation: WriteData('saved', search[0], lemmaInfos, sourceLang, transLang)
