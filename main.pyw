@@ -192,14 +192,13 @@ for i, argument in enumerate(sys.argv[1:]):
             case 'h': Help()
             # Shows log of translations
             case 'l': 
-                logs = GetData('logs')
                 print(f'\n \033[1;35m(≧∇≦) Displaying your logs:\033[00m\n')
-                for page in logs: 
+                for page in GetData('logs'): 
                     print(f"   \033[1;00m1. \033[00m\033[3m{page['search']} \033[00m\033[2m|\033[00m {page['source']} - {page['translated']}\033[00m")
 
-                saved = GetData('saved')
                 print(f'\n \033[1;35m(≧∇≦) Displaying your saved translations:\033[00m\n')
-                for page in saved: print(f"   \033[1;00m1. \033[00m\033[3m{page['search']} \033[00m\033[2m|\033[00m {page['source']} - {page['translated']}\033[00m")
+                for page in GetData('saved'): 
+                    print(f"   \033[1;00m1. \033[00m\033[3m{page['search']} \033[00m\033[2m|\033[00m {page['source']} - {page['translated']}\033[00m")
                 
                 print(); exit()
             # Changes config file
@@ -295,6 +294,19 @@ if len(search) > 1:
 
     print(textTranslation)
     exit()
+
+# Checks if translations is saved or is in the logs (loads faster, no need to internet connection)
+
+# Organize everything with indexes and alphabetical order (then you can do binary search)
+for page in GetData('saved'):
+    if page['search'] == search[0] and page['source'] == sourceLang and page['translated'] == transLang:
+        # Transform json into page object and use function display()
+        exit()
+
+for page in GetData('logs'):
+    if page['search'] == search[0] and page['source'] == sourceLang and page['translated'] == transLang:
+        # Transform json into page object and use function display()
+        exit()
 
 # Gets linguee url 
 lingueeUrl = f'https://www.linguee{dotDomain}/{sourceLang}-{transLang}/search?source=auto&query={search[0]}'
