@@ -178,6 +178,9 @@ def Help():
 if len(sys.argv) <= 1:
     MissingArgument()
 
+# Read-only
+propertyNames = ['sourceLanguage', 'translate', 'numberLogs', 'domain']
+
 search = []
 saveTranslation = False
 usingOptions = False
@@ -206,9 +209,7 @@ for i, argument in enumerate(sys.argv[1:]):
                 # Looks for option arguments
                 if len(sys.argv) <= i + 2: MissingArgument('option argument')
 
-                propStrs = ['sourceLanguage', 'translate', 'numberLogs', 'domain']
-                properties = []    
-                
+                properties = []                    
                 # Loops through option arguments
                 for optArg in sys.argv[i+2:]:
                     if optArg[0] == '-': break;
@@ -216,13 +217,13 @@ for i, argument in enumerate(sys.argv[1:]):
                     if optArg.find('=') != -1:
                         # Separates into list with propertyName and propertyArgument
                         prop = optArg.split('=')
-                        # Checks if the propertyName matches any property available in propStrs
+                        # Checks if the propertyName matches any property available in propertyNames
                         
                         # Creates list with booleans depending 
-                        # if the propertyName matches one of the strings in propStrs,
+                        # if the propertyName matches one of the strings in propertyNames,
                         # if no string matches the propertyName, than the propertyName inserted is invalid.
                         correctStr = False
-                        for k in list(map(lambda x: prop[0] == x, propStrs)):
+                        for k in list(map(lambda x: prop[0] == x, propertyNames)):
                             if k: correctStr = True
                         if not correctStr: ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Incorrect config option name. Use -d to see options names.\033[00m")
                         
@@ -237,7 +238,7 @@ for i, argument in enumerate(sys.argv[1:]):
                             if arg == '': continue;
 
                             # Add string to correponding property
-                            properties.append([propStrs[i], arg])
+                            properties.append([propertyNames[i], arg])
                 
                 # Checks if languages are correct
                 for prop in properties:
@@ -264,8 +265,8 @@ for i, argument in enumerate(sys.argv[1:]):
             case 'd':
                 config = OpenConfig()
                 print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[3mDisplaying useful information:\033[00m\n')
-                print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage']}')
-                print(  f' \033[1;33mtranslate:\033[00m {config['translate']}\n')
+                print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0] ({config['sourceLanguage'][1]})}')
+                print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} ({config['translate'][1]})\n')
                 print(  f' \033[1;34mnumberLogs:\033[00m {config['numberLogs']}\n')
                 print(  f' \033[1;35mdomain:\033[00m {config['domain']}\n')
 
