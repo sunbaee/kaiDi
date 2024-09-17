@@ -1,5 +1,5 @@
-from bs4 import BeautifulSoup;
-import requests;
+from bs4 import BeautifulSoup; import lxml;
+import requests; 
 import shelve;
 import json;
 import sys;
@@ -228,29 +228,37 @@ for i, argument in enumerate(sys.argv[1:]):
                         
                         properties.append(prop)
                     else:
-                        # Fast syntax using ':' (only insert arguments)
+                        # Fast syntax using ':' (only insert arguments, separated by ':')
+                        # Checks if argument syntax is correct
                         if optArg.find(':') == -1: ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Incorrect syntax.\033[00m")
 
+                        # If the string is empty, it's ignored
                         for i, arg in enumerate(optArg.split(':')):
                             if arg == '': continue;
 
+                            # Add string to correponding property
                             properties.append([propStrs[i], arg])
                 
+                # Checks if languages are correct
+                for prop in properties:
+                    if prop[0] == 'sourceLanguage' or prop[0] == 'translate':
+                        prop[1] = CheckLanguage(prop[1])
+
                 # Updates config file
                 with open('config.json', "r+") as file:
                     config = json.load(file)
 
-                    for prop in properties: 
+                    # Writes all properties and displays changes
+                    print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The following properties were changed: \n')
+                    for i, prop in enumerate(properties): 
                         config[prop[0]] = prop[1]
+                        print(f'   \033[1;37m{i + 1}.\033[00m\033[3;37m"{prop[0]}"\033[00m was changed to \033[3;37m"{prop[1]}"\033[00m.')
 
                     file.seek(0)
                     json.dump(config, file)
                     file.truncate()
 
-                # Displays property change feedback
-                print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The following properties were changed: \n')
-                for i, p in enumerate(properties): print(f'   \033[1;37m{i + 1}.\033[00m\033[3;37m"{p[0]}"\033[00m was changed to \033[3;37m"{p[1]}"\033[00m.')
-
+                # If there's no search, creates new line and exit()
                 if (len(search) == 0): print(); exit()
             # Display options from the configuration file
             case 'd':
@@ -274,6 +282,7 @@ for i, argument in enumerate(sys.argv[1:]):
 config = OpenConfig()
 
 dotDomain = config['domain']
+
 sourceLang = config['sourceLanguage']
 transLang = config['translate']
 
@@ -286,7 +295,7 @@ if len(search) > 1:
 
         searchText += fStr
     
-    deeplUrl = f'https://www.deepl.com/en/translator#en/fr/{searchText}'
+    deeplUrl = f'https://www.deepl.com/en/translator#{sourceLang[1]}/{transLang[1]}/{searchText}'
 
     soup = SoupConnect(deeplUrl)
     #[aria-labelledby]="translation-target-heading"
@@ -299,17 +308,17 @@ if len(search) > 1:
 
 # Organize everything with indexes and alphabetical order (then you can do binary search)
 for page in GetData('saved'):
-    if page['search'] == search[0] and page['source'] == sourceLang and page['translated'] == transLang:
+    if page['search'] == search[0] and page['source'] == sourceLang[1] and page['translated'] == transLang[1]:
         # Transform json into page object and use function display()
         exit()
 
 for page in GetData('logs'):
-    if page['search'] == search[0] and page['source'] == sourceLang and page['translated'] == transLang:
+    if page['search'] == search[0] and page['source'] == sourceLang[1] and page['translated'] == transLang[1]:
         # Transform json into page object and use function display()
         exit()
 
 # Gets linguee url 
-lingueeUrl = f'https://www.linguee{dotDomain}/{sourceLang}-{transLang}/search?source=auto&query={search[0]}'
+lingueeUrl = f'https://www.linguee{dotDomain}/{sourceLang[0]}-{transLang[0]}/search?source=auto&query={search[0]}'
 soup = SoupConnect(lingueeUrl)
 
 # Gets lemmas (chunks of text)
@@ -329,7 +338,7 @@ for info in lemmaInfos:
 print()
 
 # Saves to log history
-WriteData('logs', search[0], lemmaInfos, sourceLang, transLang)
+WriteData('logs', search[0], lemmaInfos, sourceLang[1], transLang[1])
 
 # Saves to saved section (-s option)
-if saveTranslation: WriteData('saved', search[0], lemmaInfos, sourceLang, transLang)
+if saveTranslation: WriteData('saved', search[0], lemmaInfos, sourceLang[1], transLang[1])
