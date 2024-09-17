@@ -90,7 +90,7 @@ class Page:
             "translated": self.trsLanguage
         }
 
-# Functions transform html elements into the scraping objects above
+# Functions that transform html elements into scraping objects of the classes above
 
 def GetTransDescription(tag):
     # Gets description from a translation class
@@ -214,8 +214,7 @@ def Help():
     exit()
 
 # Checks arguments
-if len(sys.argv) <= 1:
-    MissingArgument()
+if len(sys.argv) <= 1: Help()
 
 # Read-only
 propertyNames = ['sourceLanguage', 'translate', 'numberLogs', 'domain']
