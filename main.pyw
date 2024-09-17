@@ -90,6 +90,8 @@ class Page:
             "translated": self.trsLanguage
         }
 
+# Functions transform html elements into the scraping objects above
+
 def GetTransDescription(tag):
     # Gets description from a translation class
     titleArr = tag.select('.translation_desc .dictLink')
@@ -149,9 +151,32 @@ def GetData(section):
     with shelve.open('data.db') as dataFile:
         return dataFile[section]
 
-def OpenConfig():
-    with open("config.json", "r") as file:
+def OpenJSON(fileName):
+    with open(fileName, "r") as file:
         return json.load(file)
+
+def CheckLanguage(language):
+    # Index inside specific language (0: language name, 1: language code)
+    inDex = 1 if len(language) == 2 else 0;
+    
+    # Receives language or language code, checks if it exists and returns the correct language with its iso639 language code.
+    languages = OpenJSON('languages.json')
+    
+    start = 0
+    end = len(languages) - 1
+    while start <= end:
+        # Index of a language in the language file
+        outDex = (start + end) // 2
+        curString = languages[outDex][inDex]
+
+        if curString > language: 
+            end = outDex - 1; continue;
+        elif curString < language: 
+            start = outDex + 1; continue;
+        
+        return languages[outDex];
+
+    return -1;
 
 # Messages
 
@@ -173,6 +198,9 @@ def Help():
     print("  -c prop=arg : Changes config file options.")
     print("  -h          : Shows this help message.\n")
     exit()
+
+print(CheckLanguage(sys.argv[1]))
+exit()
 
 # Checks arguments
 if len(sys.argv) <= 1:
@@ -263,7 +291,7 @@ for i, argument in enumerate(sys.argv[1:]):
                 if (len(search) == 0): print(); exit()
             # Display options from the configuration file
             case 'd':
-                config = OpenConfig()
+                config = OpenJSON('config.json')
                 print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[3mDisplaying useful information:\033[00m\n')
                 print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0] ({config['sourceLanguage'][1]})}')
                 print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} ({config['translate'][1]})\n')
@@ -280,7 +308,7 @@ for i, argument in enumerate(sys.argv[1:]):
     if not usingOptions: search.append(argument);
     
 # Get values from json file
-config = OpenConfig()
+config = OpenJSON('config.json')
 
 dotDomain = config['domain']
 
