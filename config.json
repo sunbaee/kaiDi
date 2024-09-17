@@ -1,6 +1,1 @@
-{
-    "sourceLanguage": "english",
-    "translate": "french",
-    "domain": ".com",
-    "numberLogs": "5"
-}
+{"sourceLanguage": ["portuguese", "pt"], "translate": ["english", "en"], "domain": ".com", "numberLogs": "5"}

@@ -1,16 +1,12 @@
 {
     "sortedLanguages": [
         [
-            "afar",
-            "aa"
-        ],
-        [
             "abkhazian",
             "ab"
         ],
         [
-            "avestan",
-            "ae"
+            "afar",
+            "aa"
         ],
         [
             "afrikaans",
@@ -21,16 +17,24 @@
             "ak"
         ],
         [
+            "albanian",
+            "sq"
+        ],
+        [
             "amharic",
             "am"
+        ],
+        [
+            "arabic",
+            "ar"
         ],
         [
             "aragonese",
             "an"
         ],
         [
-            "arabic",
-            "ar"
+            "armenian",
+            "hy"
         ],
         [
             "assamese",
@@ -41,6 +45,10 @@
             "av"
         ],
         [
+            "avestan",
+            "ae"
+        ],
+        [
             "aymara",
             "ay"
         ],
@@ -49,56 +57,92 @@
             "az"
         ],
         [
+            "bambara",
+            "bm"
+        ],
+        [
             "bashkir",
             "ba"
+        ],
+        [
+            "basque",
+            "eu"
         ],
         [
             "belarusian",
             "be"
         ],
         [
-            "bulgarian",
-            "bg"
+            "bengali",
+            "bn"
         ],
         [
             "bislama",
             "bi"
         ],
         [
-            "bambara",
-            "bm"
-        ],
-        [
-            "bengali",
-            "bn"
-        ],
-        [
-            "tibetan",
-            "bo"
+            "bosnian",
+            "bs"
         ],
         [
             "breton",
             "br"
         ],
         [
-            "bosnian",
-            "bs"
+            "bulgarian",
+            "bg"
+        ],
+        [
+            "burmese",
+            "my"
+        ],
+        [
+            "castilian",
+            "es"
         ],
         [
             "catalan",
             "ca"
         ],
         [
-            "valencian",
-            "ca"
+            "central khmer",
+            "km"
+        ],
+        [
+            "chamorro",
+            "ch"
         ],
         [
             "chechen",
             "ce"
         ],
         [
-            "chamorro",
-            "ch"
+            "chewa",
+            "ny"
+        ],
+        [
+            "chichewa",
+            "ny"
+        ],
+        [
+            "chinese",
+            "zh"
+        ],
+        [
+            "chuang",
+            "za"
+        ],
+        [
+            "church slavonic",
+            "cu"
+        ],
+        [
+            "chuvash",
+            "cv"
+        ],
+        [
+            "cornish",
+            "kw"
         ],
         [
             "corsican",
@@ -109,36 +153,16 @@
             "cr"
         ],
         [
+            "croatian",
+            "hr"
+        ],
+        [
             "czech",
             "cs"
         ],
         [
-            "church slavonic",
-            "cu"
-        ],
-        [
-            "old church slavonic",
-            "cu"
-        ],
-        [
-            "old slavonic",
-            "cu"
-        ],
-        [
-            "chuvash",
-            "cv"
-        ],
-        [
-            "welsh",
-            "cy"
-        ],
-        [
             "danish",
             "da"
-        ],
-        [
-            "german",
-            "de"
         ],
         [
             "dhivehi",
@@ -149,24 +173,12 @@
             "dv"
         ],
         [
-            "maldivian",
-            "dv"
+            "dutch",
+            "nl"
         ],
         [
             "dzongkha",
             "dz"
-        ],
-        [
-            "ewe",
-            "ee"
-        ],
-        [
-            "greek",
-            "el"
-        ],
-        [
-            "modern",
-            "el"
         ],
         [
             "english",
@@ -177,64 +189,68 @@
             "eo"
         ],
         [
-            "castilian",
-            "es"
-        ],
-        [
-            "spanish",
-            "es"
-        ],
-        [
             "estonian",
             "et"
         ],
         [
-            "basque",
-            "eu"
-        ],
-        [
-            "persian",
-            "fa"
-        ],
-        [
-            "fulah",
-            "ff"
-        ],
-        [
-            "finnish",
-            "fi"
-        ],
-        [
-            "fijian",
-            "fj"
+            "ewe",
+            "ee"
         ],
         [
             "faroese",
             "fo"
         ],
         [
+            "fijian",
+            "fj"
+        ],
+        [
+            "finnish",
+            "fi"
+        ],
+        [
+            "flemish",
+            "nl"
+        ],
+        [
             "french",
             "fr"
         ],
         [
-            "western frisian",
-            "fy"
-        ],
-        [
-            "irish",
-            "ga"
+            "fulah",
+            "ff"
         ],
         [
             "gaelic",
             "gd"
         ],
         [
-            "scottish gaelic",
-            "gd"
-        ],
-        [
             "galician",
             "gl"
+        ],
+        [
+            "ganda",
+            "lg"
+        ],
+        [
+            "georgian",
+            "ka"
+        ],
+        [
+            "german",
+            "de"
+        ],
+        [
+            "gikuyu",
+            "ki"
+        ],
+        [
+            "greek",
+            "el"
+        ],
+        [
+            "greenlandic",
+            "kl"
         ],
         [
             "guarani",
@@ -245,8 +261,12 @@
             "gu"
         ],
         [
-            "manx",
-            "gv"
+            "haitian",
+            "ht"
+        ],
+        [
+            "haitian creole",
+            "ht"
         ],
         [
             "hausa",
@@ -257,6 +277,10 @@
             "he"
         ],
         [
+            "herero",
+            "hz"
+        ],
+        [
             "hindi",
             "hi"
         ],
@@ -265,76 +289,48 @@
             "ho"
         ],
         [
-            "croatian",
-            "hr"
-        ],
-        [
-            "haitian",
-            "ht"
-        ],
-        [
-            "haitian creole",
-            "ht"
-        ],
-        [
             "hungarian",
             "hu"
-        ],
-        [
-            "armenian",
-            "hy"
-        ],
-        [
-            "herero",
-            "hz"
-        ],
-        [
-            "interlingua",
-            "ia"
-        ],
-        [
-            "indonesian",
-            "id"
-        ],
-        [
-            "interlingue",
-            "ie"
-        ],
-        [
-            "occidental",
-            "ie"
-        ],
-        [
-            "igbo",
-            "ig"
-        ],
-        [
-            "nuosu",
-            "ii"
-        ],
-        [
-            "sichuan yi",
-            "ii"
-        ],
-        [
-            "inupiaq",
-            "ik"
-        ],
-        [
-            "ido",
-            "io"
         ],
         [
             "icelandic",
             "is"
         ],
         [
-            "italian",
-            "it"
+            "ido",
+            "io"
+        ],
+        [
+            "igbo",
+            "ig"
+        ],
+        [
+            "indonesian",
+            "id"
+        ],
+        [
+            "interlingua",
+            "ia"
+        ],
+        [
+            "interlingue",
+            "ie"
         ],
         [
             "inuktitut",
             "iu"
+        ],
+        [
+            "inupiaq",
+            "ik"
+        ],
+        [
+            "irish",
+            "ga"
+        ],
+        [
+            "italian",
+            "it"
         ],
         [
             "japanese",
@@ -345,52 +341,12 @@
             "jv"
         ],
         [
-            "georgian",
-            "ka"
-        ],
-        [
-            "kongo",
-            "kg"
-        ],
-        [
-            "gikuyu",
-            "ki"
-        ],
-        [
-            "kikuyu",
-            "ki"
-        ],
-        [
-            "kuanyama",
-            "kj"
-        ],
-        [
-            "kwanyama",
-            "kj"
-        ],
-        [
-            "kazakh",
-            "kk"
-        ],
-        [
-            "greenlandic",
-            "kl"
-        ],
-        [
             "kalaallisut",
             "kl"
         ],
         [
-            "central khmer",
-            "km"
-        ],
-        [
             "kannada",
             "kn"
-        ],
-        [
-            "korean",
-            "ko"
         ],
         [
             "kanuri",
@@ -401,40 +357,64 @@
             "ks"
         ],
         [
-            "kurdish",
-            "ku"
+            "kazakh",
+            "kk"
         ],
         [
-            "komi",
-            "kv"
+            "kikuyu",
+            "ki"
         ],
         [
-            "cornish",
-            "kw"
+            "kinyarwanda",
+            "rw"
         ],
         [
             "kirghiz",
             "ky"
         ],
         [
+            "komi",
+            "kv"
+        ],
+        [
+            "kongo",
+            "kg"
+        ],
+        [
+            "korean",
+            "ko"
+        ],
+        [
+            "kuanyama",
+            "kj"
+        ],
+        [
+            "kurdish",
+            "ku"
+        ],
+        [
+            "kwanyama",
+            "kj"
+        ],
+        [
             "kyrgyz",
             "ky"
+        ],
+        [
+            "lao",
+            "lo"
         ],
         [
             "latin",
             "la"
         ],
         [
+            "latvian",
+            "lv"
+        ],
+        [
             "letzeburgesch",
             "lb"
-        ],
-        [
-            "luxembourgish",
-            "lb"
-        ],
-        [
-            "ganda",
-            "lg"
         ],
         [
             "limburgan",
@@ -453,10 +433,6 @@
             "ln"
         ],
         [
-            "lao",
-            "lo"
-        ],
-        [
             "lithuanian",
             "lt"
         ],
@@ -465,172 +441,52 @@
             "lu"
         ],
         [
-            "latvian",
-            "lv"
-        ],
-        [
-            "malagasy",
-            "mg"
-        ],
-        [
-            "marshallese",
-            "mh"
-        ],
-        [
-            "maori",
-            "mi"
+            "luxembourgish",
+            "lb"
         ],
         [
             "macedonian",
             "mk"
         ],
         [
-            "malayalam",
-            "ml"
-        ],
-        [
-            "mongolian",
-            "mn"
-        ],
-        [
-            "marathi",
-            "mr"
+            "malagasy",
+            "mg"
         ],
         [
             "malay",
             "ms"
         ],
         [
+            "malayalam",
+            "ml"
+        ],
+        [
+            "maldivian",
+            "dv"
+        ],
+        [
             "maltese",
             "mt"
         ],
         [
-            "burmese",
-            "my"
+            "manx",
+            "gv"
         ],
         [
-            "nauru",
-            "na"
+            "maori",
+            "mi"
         ],
         [
-            "norwegian bokm\u00e5l",
-            "nb"
+            "marathi",
+            "mr"
         ],
         [
-            "north ndebele",
-            "nd"
+            "marshallese",
+            "mh"
         ],
         [
-            "nepali",
-            "ne"
-        ],
-        [
-            "ndonga",
-            "ng"
-        ],
-        [
-            "dutch",
-            "nl"
-        ],
-        [
-            "flemish",
-            "nl"
-        ],
-        [
-            "norwegian nynorsk",
-            "nn"
-        ],
-        [
-            "norwegian",
-            "no"
-        ],
-        [
-            "south ndebele",
-            "nr"
-        ],
-        [
-            "navaho",
-            "nv"
-        ],
-        [
-            "navajo",
-            "nv"
-        ],
-        [
-            "chewa",
-            "ny"
-        ],
-        [
-            "chichewa",
-            "ny"
-        ],
-        [
-            "nyanja",
-            "ny"
-        ],
-        [
-            "occitan",
-            "oc"
-        ],
-        [
-            "ojibwa",
-            "oj"
-        ],
-        [
-            "oromo",
-            "om"
-        ],
-        [
-            "oriya",
-            "or"
-        ],
-        [
-            "ossetian",
-            "os"
-        ],
-        [
-            "ossetic",
-            "os"
-        ],
-        [
-            "panjabi",
-            "pa"
-        ],
-        [
-            "punjabi",
-            "pa"
-        ],
-        [
-            "pali",
-            "pi"
-        ],
-        [
-            "polish",
-            "pl"
-        ],
-        [
-            "pashto",
-            "ps"
-        ],
-        [
-            "pushto",
-            "ps"
-        ],
-        [
-            "portuguese",
-            "pt"
-        ],
-        [
-            "quechua",
-            "qu"
-        ],
-        [
-            "romansh",
-            "rm"
-        ],
-        [
-            "rundi",
-            "rn"
+            "modern",
+            "el"
         ],
         [
             "moldavian",
@@ -641,16 +497,152 @@
             "ro"
         ],
         [
+            "mongolian",
+            "mn"
+        ],
+        [
+            "nauru",
+            "na"
+        ],
+        [
+            "navaho",
+            "nv"
+        ],
+        [
+            "navajo",
+            "nv"
+        ],
+        [
+            "ndonga",
+            "ng"
+        ],
+        [
+            "nepali",
+            "ne"
+        ],
+        [
+            "north ndebele",
+            "nd"
+        ],
+        [
+            "northern sami",
+            "se"
+        ],
+        [
+            "norwegian",
+            "no"
+        ],
+        [
+            "norwegian bokm\u00e5l",
+            "nb"
+        ],
+        [
+            "norwegian nynorsk",
+            "nn"
+        ],
+        [
+            "nuosu",
+            "ii"
+        ],
+        [
+            "nyanja",
+            "ny"
+        ],
+        [
+            "occidental",
+            "ie"
+        ],
+        [
+            "occitan",
+            "oc"
+        ],
+        [
+            "ojibwa",
+            "oj"
+        ],
+        [
+            "old church slavonic",
+            "cu"
+        ],
+        [
+            "old slavonic",
+            "cu"
+        ],
+        [
+            "oriya",
+            "or"
+        ],
+        [
+            "oromo",
+            "om"
+        ],
+        [
+            "ossetian",
+            "os"
+        ],
+        [
+            "ossetic",
+            "os"
+        ],
+        [
+            "pali",
+            "pi"
+        ],
+        [
+            "panjabi",
+            "pa"
+        ],
+        [
+            "pashto",
+            "ps"
+        ],
+        [
+            "persian",
+            "fa"
+        ],
+        [
+            "polish",
+            "pl"
+        ],
+        [
+            "portuguese",
+            "pt"
+        ],
+        [
+            "punjabi",
+            "pa"
+        ],
+        [
+            "pushto",
+            "ps"
+        ],
+        [
+            "quechua",
+            "qu"
+        ],
+        [
             "romanian",
             "ro"
+        ],
+        [
+            "romansh",
+            "rm"
+        ],
+        [
+            "rundi",
+            "rn"
         ],
         [
             "russian",
             "ru"
         ],
         [
-            "kinyarwanda",
-            "rw"
+            "samoan",
+            "sm"
+        ],
+        [
+            "sango",
+            "sg"
         ],
         [
             "sanskrit",
@@ -661,16 +653,24 @@
             "sc"
         ],
         [
+            "scottish gaelic",
+            "gd"
+        ],
+        [
+            "serbian",
+            "sr"
+        ],
+        [
+            "shona",
+            "sn"
+        ],
+        [
+            "sichuan yi",
+            "ii"
+        ],
+        [
             "sindhi",
             "sd"
-        ],
-        [
-            "northern sami",
-            "se"
-        ],
-        [
-            "sango",
-            "sg"
         ],
         [
             "sinhala",
@@ -689,107 +689,99 @@
             "sl"
         ],
         [
-            "samoan",
-            "sm"
-        ],
-        [
-            "shona",
-            "sn"
-        ],
-        [
             "somali",
             "so"
         ],
         [
-            "albanian",
-            "sq"
-        ],
-        [
-            "serbian",
-            "sr"
-        ],
-        [
-            "swati",
-            "ss"
+            "south ndebele",
+            "nr"
         ],
         [
             "southern sotho",
             "st"
         ],
         [
-            "sundanese",
-            "su"
+            "spanish",
+            "es"
         ],
         [
-            "swedish",
-            "sv"
+            "sundanese",
+            "su"
         ],
         [
             "swahili",
             "sw"
         ],
         [
-            "tamil",
-            "ta"
+            "swati",
+            "ss"
         ],
         [
-            "telugu",
-            "te"
-        ],
-        [
-            "tajik",
-            "tg"
-        ],
-        [
-            "thai",
-            "th"
-        ],
-        [
-            "tigrinya",
-            "ti"
-        ],
-        [
-            "turkmen",
-            "tk"
+            "swedish",
+            "sv"
         ],
         [
             "tagalog",
             "tl"
         ],
         [
-            "tswana",
-            "tn"
+            "tahitian",
+            "ty"
         ],
         [
-            "tonga",
-            "to"
+            "tajik",
+            "tg"
         ],
         [
-            "turkish",
-            "tr"
-        ],
-        [
-            "tsonga",
-            "ts"
+            "tamil",
+            "ta"
         ],
         [
             "tatar",
             "tt"
         ],
         [
+            "telugu",
+            "te"
+        ],
+        [
+            "thai",
+            "th"
+        ],
+        [
+            "tibetan",
+            "bo"
+        ],
+        [
+            "tigrinya",
+            "ti"
+        ],
+        [
+            "tonga",
+            "to"
+        ],
+        [
+            "tsonga",
+            "ts"
+        ],
+        [
+            "tswana",
+            "tn"
+        ],
+        [
+            "turkish",
+            "tr"
+        ],
+        [
+            "turkmen",
+            "tk"
+        ],
+        [
             "twi",
             "tw"
         ],
         [
-            "tahitian",
-            "ty"
-        ],
-        [
             "uighur",
-            "ug"
-        ],
-        [
-            "uyghur",
             "ug"
         ],
         [
@@ -801,8 +793,16 @@
             "ur"
         ],
         [
+            "uyghur",
+            "ug"
+        ],
+        [
             "uzbek",
             "uz"
+        ],
+        [
+            "valencian",
+            "ca"
         ],
         [
             "venda",
@@ -821,6 +821,14 @@
             "wa"
         ],
         [
+            "welsh",
+            "cy"
+        ],
+        [
+            "western frisian",
+            "fy"
+        ],
+        [
             "wolof",
             "wo"
         ],
@@ -837,16 +845,8 @@
             "yo"
         ],
         [
-            "chuang",
-            "za"
-        ],
-        [
             "zhuang",
             "za"
-        ],
-        [
-            "chinese",
-            "zh"
         ],
         [
             "zulu",
@@ -971,11 +971,11 @@
             "cu"
         ],
         [
-            "old church slavonic",
+            "old slavonic",
             "cu"
         ],
         [
-            "old slavonic",
+            "old church slavonic",
             "cu"
         ],
         [
@@ -995,11 +995,11 @@
             "de"
         ],
         [
-            "dhivehi",
+            "divehi",
             "dv"
         ],
         [
-            "divehi",
+            "dhivehi",
             "dv"
         ],
         [
@@ -1031,11 +1031,11 @@
             "eo"
         ],
         [
-            "castilian",
+            "spanish",
             "es"
         ],
         [
-            "spanish",
+            "castilian",
             "es"
         ],
         [
@@ -1163,11 +1163,11 @@
             "ig"
         ],
         [
-            "nuosu",
+            "sichuan yi",
             "ii"
         ],
         [
-            "sichuan yi",
+            "nuosu",
             "ii"
         ],
         [
@@ -1207,11 +1207,11 @@
             "kg"
         ],
         [
-            "gikuyu",
+            "kikuyu",
             "ki"
         ],
         [
-            "kikuyu",
+            "gikuyu",
             "ki"
         ],
         [
@@ -1227,11 +1227,11 @@
             "kk"
         ],
         [
-            "greenlandic",
+            "kalaallisut",
             "kl"
         ],
         [
-            "kalaallisut",
+            "greenlandic",
             "kl"
         ],
         [
@@ -1279,11 +1279,11 @@
             "la"
         ],
         [
-            "letzeburgesch",
+            "luxembourgish",
             "lb"
         ],
         [
-            "luxembourgish",
+            "letzeburgesch",
             "lb"
         ],
         [
@@ -1403,19 +1403,19 @@
             "nr"
         ],
         [
-            "navaho",
-            "nv"
-        ],
-        [
             "navajo",
             "nv"
         ],
         [
-            "chewa",
-            "ny"
+            "navaho",
+            "nv"
         ],
         [
             "chichewa",
+            "ny"
+        ],
+        [
+            "chewa",
             "ny"
         ],
         [
@@ -1447,11 +1447,11 @@
             "os"
         ],
         [
-            "panjabi",
+            "punjabi",
             "pa"
         ],
         [
-            "punjabi",
+            "panjabi",
             "pa"
         ],
         [
@@ -1487,15 +1487,15 @@
             "rn"
         ],
         [
+            "romanian",
+            "ro"
+        ],
+        [
             "moldavian",
             "ro"
         ],
         [
             "moldovan",
-            "ro"
-        ],
-        [
-            "romanian",
             "ro"
         ],
         [
@@ -1691,11 +1691,11 @@
             "yo"
         ],
         [
-            "chuang",
+            "zhuang",
             "za"
         ],
         [
-            "zhuang",
+            "chuang",
             "za"
         ],
         [

@@ -6,7 +6,7 @@ import sys;
 
 # Custom exception
 class StatusException(Exception):
-    pass
+    pass;
 
 # Classes for scraping
 
@@ -155,13 +155,22 @@ def OpenJSON(fileName):
     with open(fileName, "r") as file:
         return json.load(file)
 
+# Receives language or language code, checks if it exists and returns the correct language with its iso639 language code.
 def CheckLanguage(language):
-    # Index inside specific language (0: language name, 1: language code)
-    inDex = 1 if len(language) == 2 else 0;
-    
-    # Receives language or language code, checks if it exists and returns the correct language with its iso639 language code.
-    languages = OpenJSON('languages.json')
-    
+    langFile = OpenJSON('languages.json')
+
+    # * inDex is the index inside a specific language (0: language name, 1: language code)
+
+    # Checks if the user inserted an abbreviation or 
+    # a language name and changes inDex and languages variables accordingly
+    if len(language) == 2:
+        languages = langFile['sortedCodes']
+        inDex = 1
+    else:
+        languages = langFile['sortedLanguages']
+        inDex = 0;
+
+    # Binary search to find if the language is in the languages.json file
     start = 0
     end = len(languages) - 1
     while start <= end:
@@ -174,9 +183,14 @@ def CheckLanguage(language):
         elif curString < language: 
             start = outDex + 1; continue;
         
+        # Returns array containing the language name and its corresponding code
         return languages[outDex];
 
-    return -1;
+    # Exits if language wasn't found
+    ExitMSG("\033[1;31m /ᐠ - ˕ -マ Language or language code was not found. \033[00m\033[1m\n" + 
+                    "\n  Use the ISO language standard for names, or the ISO 639-1 for language codes. " + 
+                    "\n  The list of ISO standards is available on: \n\033[00m" + 
+                    "\n  \033[3mhttps://en.wikipedia.org/wiki/List_of_ISO_639_language_codes\033[00m")
 
 # Messages
 
@@ -198,9 +212,6 @@ def Help():
     print("  -c prop=arg : Changes config file options.")
     print("  -h          : Shows this help message.\n")
     exit()
-
-print(CheckLanguage(sys.argv[1]))
-exit()
 
 # Checks arguments
 if len(sys.argv) <= 1:
@@ -224,10 +235,12 @@ for i, argument in enumerate(sys.argv[1:]):
             # Shows log of translations
             case 'l': 
                 print(f'\n \033[1;35m(≧∇≦) Displaying your logs:\033[00m\n')
+                # Gets every page dictionary in logs and displays information about that page
                 for page in GetData('logs'): 
                     print(f"   \033[1;00m1. \033[00m\033[3m{page['search']} \033[00m\033[2m|\033[00m {page['source']} - {page['translated']}\033[00m")
 
                 print(f'\n \033[1;35m(≧∇≦) Displaying your saved translations:\033[00m\n')
+                # Same thing but with saved dictionary
                 for page in GetData('saved'): 
                     print(f"   \033[1;00m1. \033[00m\033[3m{page['search']} \033[00m\033[2m|\033[00m {page['source']} - {page['translated']}\033[00m")
                 
@@ -281,7 +294,9 @@ for i, argument in enumerate(sys.argv[1:]):
                     print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The following properties were changed: \n')
                     for i, prop in enumerate(properties): 
                         config[prop[0]] = prop[1]
-                        print(f'   \033[1;37m{i + 1}.\033[00m\033[3;37m"{prop[0]}"\033[00m was changed to \033[3;37m"{prop[1]}"\033[00m.')
+
+                        argumentString = f'\033[3;37m"{prop[1][0]} ({prop[1][1]})"\033[00m.' if prop[0] == 'sourceLanguage' or prop[0] == 'translate' else f'\033[3;37m"{prop[1]}"\033[00m.';
+                        print(f'   \033[1;37m{i + 1}.\033[00m\033[3;37m"{prop[0]}"\033[00m was changed to {argumentString}')
 
                     file.seek(0)
                     json.dump(config, file)
@@ -292,9 +307,9 @@ for i, argument in enumerate(sys.argv[1:]):
             # Display options from the configuration file
             case 'd':
                 config = OpenJSON('config.json')
-                print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[3mDisplaying useful information:\033[00m\n')
-                print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0] ({config['sourceLanguage'][1]})}')
-                print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} ({config['translate'][1]})\n')
+                print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[1mDisplaying useful information:\033[00m\n')
+                print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0]} \033[2m({config['sourceLanguage'][1]})\033[00m')
+                print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} \033[2m({config['translate'][1]})\033[00m\n')
                 print(  f' \033[1;34mnumberLogs:\033[00m {config['numberLogs']}\n')
                 print(  f' \033[1;35mdomain:\033[00m {config['domain']}\n')
 
