@@ -182,12 +182,13 @@ def CheckLanguage(language):
             end = outDex - 1; continue;
         elif curString < language: 
             start = outDex + 1; continue;
-        
+
         # Returns array containing the language name and its corresponding code
         return languages[outDex];
 
     # Exits if language wasn't found
-    ExitMSG("\033[1;31m /ᐠ - ˕ -マ Language or language code was not found. \033[00m\033[1m\n" + 
+    ExitMSG(f'\033[1;31m /ᐠ - ˕ -マ Language or language code was not found.\033[00m\033[1m\n' + 
+                   f'\n  \033[0m\033[3m* Did you mean "{languages[outDex][inDex]}" ?\033[0m\n ' +
                     "\n  Use the ISO language standard for names, or the ISO 639-1 for language codes. " + 
                     "\n  The list of ISO standards is available on: \n\033[00m" + 
                     "\n  \033[3mhttps://en.wikipedia.org/wiki/List_of_ISO_639_language_codes\033[00m")
