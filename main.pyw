@@ -5,7 +5,7 @@ import json;
 import sys;
 
 # Read-only
-propertyNames = ['sourceLanguage', 'translate', 'numberLogs', 'domain']
+propertyNames = ['sourceLanguage', 'translate', 'domain', 'numberLogs']
 
 # Important variables
 search = []
@@ -19,6 +19,10 @@ class StatusException(Exception):
 # Classes for scraping
 
 class Description:
+    def New(self, title, wordtype):
+        self.title = title;
+        self.wordtype = wordtype
+
     def __init__(self, title, wordtype):
         self.title = title.text
         self.wordtype = wordtype.text if wordtype else ''
@@ -128,27 +132,10 @@ def GetLemma(lemma):
     # Add everything to array
     return Lemma(description, transInfos, lessCommonInfo)
 
-# For fast translation
-
-def ParentDescription(parent, titleSelection, typeSelection):
-    title = parent.select(titleSelection)[0]
-    wordtype = parent.select(typeSelection)[0]
-
-    return Description(title, wordtype)
-
-def FastDescriptions(selectedRow, parentSelection, titleSelection, typeSelection):
-        descriptions = []
-        for i, row in enumerate(selectedRow):
-            parents = row.select(parentSelection)
-
-            for parent in parents: descriptions.append(ParentDescription(parent, titleSelection, typeSelection))
-
-        return descriptions
-
 # Connect to url
 def SoupConnect(fastMode):
     # Changes target depending on fastMode
-    urlParameters = f'qe={search[0]}&source={sourceLang[0]}&cw=1020&ch=423&as=shownOnStart' if fastMode else f'source=auto&query={search[0]}';
+    urlParameters = f'qe={search[0]}&source=auto&cw=980&ch=919&as=shownOnStart' if fastMode else f'source=auto&query={search[0]}';
 
     # linguee url
     url = f'https://www.linguee{dotDomain}/{sourceLang[0]}-{transLang[0]}/search?{urlParameters}'
@@ -236,15 +223,28 @@ def MissingArgument(customMessage='argument'):
     ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ No {customMessage} supplied.\033[00m")
 
 def Help():
-    print("\n Description: A script that translates things directly from the terminal.")
+    print("\n \033[1mDescription\033[0m: A script that translates things directly from the terminal.")
     print("              (˶˃ ᵕ ˂˶) .ᐟ.ᐟ \n")
-    print(" Syntax: trs yourwordhere [options]\n")
-    print(" Options: ")
-    print("  -l          : Shows log of translations and saved translations.")
-    print("  -s          : Saves the translation to be used later.")
-    print("  -d          : Displays options from the config file")
-    print("  -c prop=arg : Changes config file options.")
-    print("  -h          : Shows this help message.\n")
+    print(" \033[1mSyntax\033[0m: trs yourwordhere [options]\n")
+    print(" \033[1mOptions: \033[0m")
+    print("  -l : Shows log of translations and saved translations.")
+    print("  -s : Saves the translation to be used later.")
+    print("  -d : Displays options from the config file")
+    print("  -c : Changes config file options.")
+    print("  -f : Toggles on/off fast mode.")
+    print("  -h : Shows this help message.\n")
+    print("\033[1mExtended Details:\033[0m\n")
+    print(" -f :  Enables/Disables fast mode. Fast mode allows you to search when the linguee website responds with an \033[1;31mHTTP 429\033[0m error,")
+    print("       but its translations are very limited, not containing examples.\n")
+    print(" -c :  Option used to change the configuration of the script, ")
+    print("       you can use two syntaxes for this option: ")
+    print("         \033[1mSyntax 1\033[0m: OPT1=ARG1 OPT2=ARG2 ... ")
+    print("\n            \033[3mExamples:\033[0m sourceLanguage=en translate=de\n")
+    print("         \033[1mSyntax 2:\033[0m ARG1:ARG2:ARG3... ")
+    print("             In this syntax the options are in the order displayed using the -d option ")
+    print('             Its necessary at least one \033[3m":"\033[0m to use this syntax')
+    print("\n             \033[3mExamples:\033[0m en:pt:.com")
+    print("                       pt:\n")
     exit()
 
 # Checks arguments
@@ -336,8 +336,8 @@ for i, argument in enumerate(sys.argv[1:]):
                 print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[1mDisplaying useful information:\033[00m\n')
                 print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0]} \033[2m({config['sourceLanguage'][1]})\033[00m')
                 print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} \033[2m({config['translate'][1]})\033[00m\n')
-                print(  f' \033[1;35mnumberLogs:\033[00m {config['numberLogs']}')
-                print(  f' \033[1;35mdomain:\033[00m {config['domain']}\n')
+                print(  f' \033[1;35mdomain:\033[00m {config['domain']}')
+                print(  f' \033[1;35mnumberLogs:\033[00m {config['numberLogs']}\n')
                 print(  f' \033[1m* Fast Mode:\033[00m {config['fastTranslation']}\n')
 
                 exit()
@@ -388,7 +388,8 @@ if len(search) > 1:
     #[aria-labelledby]="translation-target-heading"
     textTranslation = soup.select('div')
 
-    print(textTranslation)
+    for div in textTranslation:
+        print(div.text)
     exit()
 
 # Checks if translations is saved or is in the logs (loads faster, no need to internet connection)
@@ -397,12 +398,12 @@ if len(search) > 1:
 for page in GetData('saved'):
     if page['search'] == search[0] and page['source'] == sourceLang[1] and page['translated'] == transLang[1]:
         # Transform json into page object and use function display()
-        exit()
+        pass
 
 for page in GetData('logs'):
     if page['search'] == search[0] and page['source'] == sourceLang[1] and page['translated'] == transLang[1]:
         # Transform json into page object and use function display()
-        exit()
+        pass
 
 # Gets linguee html 
 soup = SoupConnect(fastMode)
@@ -411,24 +412,47 @@ soup = SoupConnect(fastMode)
 lemmaInfos = []
 
 if fastMode: 
+    # Gets "lemmas" (are called completion items in html)
     compItems = soup.select('.autocompletion_item');
 
+    # Exits if doesnt find elements
     if len(compItems) <= 0:
-         ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
+        ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
     
-    for item in compItems:
-        mainRow = item.select('.main_row')[0]
-        mainDescription = ParentDescription(mainRow, '.main_item', '.main_wordtype')
-        
-        mainDescription.Display()
+    # Finds all "parents" of the translations
+    for compItem in compItems:
+        # Finds title and wordtype inside mainRow and creates description
+        mainRow = compItem.select('.main_row')[0]
 
-    exit()
-    transRow = item.select('.translation_row')[0]
-    transDescriptions = FastDescriptions(transRow, '.translation_item', '*', '.wordtype')
-    
-    translations = list(map(lambda d: Translation(d), transDescriptions))
+        mainTitle = mainRow.select('.main_item')[0]
+        mainType = mainRow.select('.main_wordtype')[0]
 
-    lemmaInfos.append(Lemma(mainDescription, translations))
+        mainDescription = Description(mainTitle, mainType)
+
+        # Finds all translations of the compItem
+        transRow = compItem.select('.translation_row')[0]
+        transItems = transRow.select('.translation_item')
+       
+        # Gets all translations from the "parent" (compItem)
+        translations = []
+        for item in transItems:
+            # Gets text and filters it into array with title and wordtype of translation
+            itemArr = item.text.replace('\r', '').replace('·', '').split('\n')
+
+            # Since Description() receives tag element from bs4 as parameter, its necessary to
+            # transform itemArr into 2 tags. 
+
+            transTitle = soup.new_tag('div')
+            transTitle.string = itemArr[1].strip()
+
+            transType  = soup.new_tag('div')
+            transType.string = itemArr[2].strip()
+
+            # Creates a translation with description from tags and appends it to translations array.
+            translations.append(Translation(Description(transTitle, transType)))
+
+        # Appends everything to lemmaInfos to be displayed and saved
+        lemmaInfos.append(Lemma(mainDescription, translations))
 else:
     # Gets lemmas (chunks of text)
     lemmas = soup.select('.exact > .lemma:not(.singleline) > div')
