@@ -4,6 +4,14 @@ import shelve;
 import json;
 import sys;
 
+# Read-only
+propertyNames = ['sourceLanguage', 'translate', 'numberLogs', 'domain']
+
+# Important variables
+search = []
+saveTranslation = False
+usingOptions = False
+
 # Custom exception
 class StatusException(Exception):
     pass;
@@ -20,7 +28,7 @@ class Description:
         print(f'{atStart}{titleColor}{self.title}\033[00m {wordTypeStr}', end=atEnd)
 
 class Translation:
-    def __init__(self, description, exampleTexts):
+    def __init__(self, description, exampleTexts=[]):
         self.description = description
         self.exampleTexts = list(map(lambda l: l.text, exampleTexts))
     
@@ -37,7 +45,7 @@ class Translation:
         }
 
 class Lemma:
-    def __init__(self, description, translations, lessCommons):
+    def __init__(self, description, translations, lessCommons=[]):
         self.description = description
         self.lessCommons = lessCommons
         self.translations = translations
@@ -120,8 +128,31 @@ def GetLemma(lemma):
     # Add everything to array
     return Lemma(description, transInfos, lessCommonInfo)
 
+# For fast translation
+
+def ParentDescription(parent, titleSelection, typeSelection):
+    title = parent.select(titleSelection)[0]
+    wordtype = parent.select(typeSelection)[0]
+
+    return Description(title, wordtype)
+
+def FastDescriptions(selectedRow, parentSelection, titleSelection, typeSelection):
+        descriptions = []
+        for i, row in enumerate(selectedRow):
+            parents = row.select(parentSelection)
+
+            for parent in parents: descriptions.append(ParentDescription(parent, titleSelection, typeSelection))
+
+        return descriptions
+
 # Connect to url
-def SoupConnect(url):
+def SoupConnect(fastMode):
+    # Changes target depending on fastMode
+    urlParameters = f'qe={search[0]}&source={sourceLang[0]}&cw=1020&ch=423&as=shownOnStart' if fastMode else f'source=auto&query={search[0]}';
+
+    # linguee url
+    url = f'https://www.linguee{dotDomain}/{sourceLang[0]}-{transLang[0]}/search?{urlParameters}'
+    
     # Handle requests and errors
     try: 
         res = requests.get(url)
@@ -131,7 +162,9 @@ def SoupConnect(url):
         ExitMSG(f'\033[1;31m (っ◞‸◟ c) An error ocurred:\033[00m\n\n   {error}')
     except StatusException as error:
         print(f'\n \033[1;31m(－－ ; Exception\033[00m: Unexpected HTML status code: \033[1;35mCODE {error}\033[00m')
-        if str(error) == '429': print('\n \033[3;90mToo many requests. Try again later...\033[00m')
+        if str(error) == '429': 
+            print('\n \033[3;90mToo many requests. Try again later...\033[0m')
+            if not fastMode: print(' \033[3;90mOr you can enable fast-translation by using the -f option. \033[00m')
         print()
         exit()
     
@@ -216,13 +249,6 @@ def Help():
 
 # Checks arguments
 if len(sys.argv) <= 1: Help()
-
-# Read-only
-propertyNames = ['sourceLanguage', 'translate', 'numberLogs', 'domain']
-
-search = []
-saveTranslation = False
-usingOptions = False
 
 # Command line options
 for i, argument in enumerate(sys.argv[1:]):
@@ -310,12 +336,28 @@ for i, argument in enumerate(sys.argv[1:]):
                 print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[1mDisplaying useful information:\033[00m\n')
                 print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0]} \033[2m({config['sourceLanguage'][1]})\033[00m')
                 print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} \033[2m({config['translate'][1]})\033[00m\n')
-                print(  f' \033[1;34mnumberLogs:\033[00m {config['numberLogs']}\n')
+                print(  f' \033[1;35mnumberLogs:\033[00m {config['numberLogs']}')
                 print(  f' \033[1;35mdomain:\033[00m {config['domain']}\n')
+                print(  f' \033[1m* Fast Mode:\033[00m {config['fastTranslation']}\n')
 
                 exit()
             # Saves translation to be used later
             case 's': saveTranslation = True;
+            # Toogle fast translation
+            case 'f': 
+                with open('config.json', "r+") as file:
+                    config = json.load(file)
+
+                    # Toogle fast translation (True / False)
+                    config['fastTranslation'] = not config['fastTranslation']
+                    print(f' \n\033[1;33m⎚⩊⎚ -✧\033[0m  Fast translation was set to \033[1m{config["fastTranslation"]}\033[0m.')
+                    
+                    file.seek(0)
+                    json.dump(config, file)
+                    file.truncate()
+
+                # If there's no search, creates new line and exit()
+                if (len(search) == 0): print(); exit()
             # Default message
             case _: ExitMSG("\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m")
     
@@ -325,10 +367,11 @@ for i, argument in enumerate(sys.argv[1:]):
 # Get values from json file
 config = OpenJSON('config.json')
 
-dotDomain = config['domain']
-
 sourceLang = config['sourceLanguage']
 transLang = config['translate']
+
+dotDomain = config['domain']
+fastMode = config['fastTranslation']
 
 if len(search) > 1:
     # Transforms array in string
@@ -361,19 +404,41 @@ for page in GetData('logs'):
         # Transform json into page object and use function display()
         exit()
 
-# Gets linguee url 
-lingueeUrl = f'https://www.linguee{dotDomain}/{sourceLang[0]}-{transLang[0]}/search?source=auto&query={search[0]}'
-soup = SoupConnect(lingueeUrl)
+# Gets linguee html 
+soup = SoupConnect(fastMode)
 
-# Gets lemmas (chunks of text)
-lemmas = soup.select('.exact > .lemma:not(.singleline) > div')
+# Initialize lemmas
+lemmaInfos = []
 
- # If there's no titles, no results where found
-if len(lemmas) <= 0:
-    ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
+if fastMode: 
+    compItems = soup.select('.autocompletion_item');
 
-# Stores lemmas
-lemmaInfos = list(map(GetLemma, lemmas))
+    if len(compItems) <= 0:
+         ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
+    
+    for item in compItems:
+        mainRow = item.select('.main_row')[0]
+        mainDescription = ParentDescription(mainRow, '.main_item', '.main_wordtype')
+        
+        mainDescription.Display()
+
+    exit()
+    transRow = item.select('.translation_row')[0]
+    transDescriptions = FastDescriptions(transRow, '.translation_item', '*', '.wordtype')
+    
+    translations = list(map(lambda d: Translation(d), transDescriptions))
+
+    lemmaInfos.append(Lemma(mainDescription, translations))
+else:
+    # Gets lemmas (chunks of text)
+    lemmas = soup.select('.exact > .lemma:not(.singleline) > div')
+
+    # If there's no titles, no results where found
+    if len(lemmas) <= 0:
+        ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
+
+    # Stores lemmas
+    lemmaInfos = list(map(GetLemma, lemmas))
 
 # Displays result
 for info in lemmaInfos:
