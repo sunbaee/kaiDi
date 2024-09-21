@@ -33,7 +33,7 @@ class Description:
         print(f'{atStart}{titleColor}{self.title}\033[00m {wordTypeStr}', end=atEnd)
 
 class Translation:
-    def __init__(self, description, exampleTexts=[]):
+    def __init__(self, description, exampleTexts):
         self.description = description
         self.exampleTexts = list(map(lambda l: l.text, exampleTexts))
     
@@ -50,12 +50,12 @@ class Translation:
         }
 
 class Lemma:
-    def __init__(self, description, translations, lessCommons=[]):
+    def __init__(self, description, translations, lessCommons):
         self.description = description
         self.lessCommons = lessCommons
         self.translations = translations
     
-    def Display(self):
+    def Display(self, fastMode=False):
         self.description.Display('\033[1;32m', '\033[3;90m', '\n   ', '')
 
         for info in self.translations:
@@ -63,11 +63,11 @@ class Lemma:
         
         if len(self.lessCommons) <= 0: return
         
-        print('\n   \033[3;32mLess common: \033[00m\n     ', end='')
+        print('\n     ', end='') if fastMode else print('\n   \033[3;32mLess common: \033[00m\n     ', end='');
         for i, lessCommon in enumerate(self.lessCommons):
             if i == len(self.lessCommons) - 1:
                 lessCommon.Display('\033[0;37m', '\033[3;90m', '')
-                continue
+                continue;
 
             lessCommon.Display('\033[0;37m', '\033[3;90m', '', ' - ')
 
@@ -449,11 +449,11 @@ if fastMode:
             transType  = soup.new_tag('div')
             transType.string = itemArr[2].strip()
 
-            # Creates a translation with description from tags and appends it to translations array.
-            translations.append(Translation(Description(transTitle, transType)))
+            # Creates a description from tags and appends it to translations array.
+            translations.append(Description(transTitle, transType))
 
-        # Appends everything to lemmaInfos to be displayed and saved
-        lemmaInfos.append(Lemma(mainDescription, translations))
+        # Uses translations as less commons (because they are just descriptions), creates lemma and appends it to lemmaInfos to be displayed and saved
+        lemmaInfos.append(Lemma(mainDescription, [], translations))
 else:
     # Gets lemmas (chunks of text)
     lemmas = soup.select('.exact > .lemma:not(.singleline) > div')
@@ -467,7 +467,7 @@ else:
 
 # Displays result
 for info in lemmaInfos:
-    info.Display()
+    info.Display(fastMode)
 
 print()
 
