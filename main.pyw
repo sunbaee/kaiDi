@@ -158,19 +158,26 @@ def SoupConnect(fastMode):
     
     return BeautifulSoup(res.text, 'lxml')
 
-# Writing/Reading files
-def WriteData(section, search, lemmaInfos, sourceLanguage, translatedLanguage):
+# Writing/Reading/Displaying files
+def WriteData(section, page):
     with shelve.open('data.db', writeback=True) as dataFile:
         # Doesnt append to database, it is overwriting it
-        dataFile[f'{section}'] = []
-        dataFile[f'{section}'].append(Page(search, lemmaInfos, sourceLanguage, translatedLanguage).Dict())
+        dataFile[f'{section}'].append(page.Dict())
 
-        dataFile.sync()
         #print(dataFile[f'{section}'])
 
 def GetData(section):
     with shelve.open('data.db') as dataFile:
         return dataFile[section]
+
+def DisplayData(section):
+    print(f'\n \033[1;35m(≧∇≦) Displaying your logs:\033[00m\n')
+
+    # Gets every page dictionary in logs and displays information about that page
+    for i, page in enumerate(GetData(section)):
+        # Makes slashes align after 20 chars, unless the search word has more than 20 chars. (min 2 blank spaces)
+        blankSpaces = ' ' * (max(0, 20 - len(page['search'])) + 2)
+        print(f"   {i + 1}.\033[0m {page['search']}{blankSpaces}\033[0m\033[2m|\033[0m\033[3m  {page['source']} - {page['translated']}\033[0m")
 
 def OpenJSON(fileName):
     with open(fileName, "r") as file:
@@ -227,7 +234,7 @@ def Help():
     print("\n \033[1mDescription\033[0m: A script that translates things directly from the terminal.")
     print("              (˶˃ ᵕ ˂˶) .ᐟ.ᐟ \n")
     print(" \033[1mSyntax\033[0m: trs yourwordhere [options]\n")
-    print(" \033[1mOptions: \033[0m")
+    print(" \033[1mOptions: \033[0m\n")
     print("  -l : Shows log of translations and saved translations.")
     print("  -s : Saves the translation to be used later.")
     print("  -d : Displays options from the config file")
@@ -239,9 +246,9 @@ def Help():
     print("       but its translations are very limited, not containing examples.\n")
     print(" -c :  Option used to change the configuration of the script, ")
     print("       you can use two syntaxes for this option: ")
-    print("         \033[1mSyntax 1\033[0m: OPT1=ARG1 OPT2=ARG2 ... ")
+    print("         \033[1mSyntax 1\033[0m: \033[3mOPT1=ARG1 OPT2=ARG2 ...\033[0m ")
     print("\n            \033[3mExamples:\033[0m sourceLanguage=en translate=de\n")
-    print("         \033[1mSyntax 2:\033[0m ARG1:ARG2:ARG3... ")
+    print("         \033[1mSyntax 2:\033[0m \033[3mARG1:ARG2:ARG3...\033[0m ")
     print("             In this syntax the options are in the order displayed using the -d option ")
     print('             Its necessary at least one \033[3m":"\033[0m to use this syntax')
     print("\n             \033[3mExamples:\033[0m en:pt:.com")
@@ -261,17 +268,9 @@ for i, argument in enumerate(sys.argv[1:]):
             case 'h': Help()
             # Shows log of translations
             case 'l': 
-                print(f'\n \033[1;35m(≧∇≦) Displaying your logs:\033[00m\n')
-                # Gets every page dictionary in logs and displays information about that page
-                for page in GetData('logs'): 
-                    print(f"   \033[1;00m1. \033[00m\033[3m{page['search']} \033[00m\033[2m|\033[00m {page['source']} - {page['translated']}\033[00m")
+                DisplayData('logs'); DisplayData('saved');
 
-                print(f'\n \033[1;35m(≧∇≦) Displaying your saved translations:\033[00m\n')
-                # Same thing but with saved dictionary
-                for page in GetData('saved'): 
-                    print(f"   \033[1;00m1. \033[00m\033[3m{page['search']} \033[00m\033[2m|\033[00m {page['source']} - {page['translated']}\033[00m")
-                
-                print(); exit()
+                print(); exit();
             # Changes config file
             case 'c':
                 # Looks for option arguments
@@ -374,6 +373,7 @@ transLang = config['translate']
 dotDomain = config['domain']
 fastMode = config['fastTranslation']
 
+# Translates full texts (more than 1 word)
 if len(search) > 1:
     # Transforms array in string
     searchText = ''
@@ -472,7 +472,7 @@ for info in lemmaInfos:
 print()
 
 # Saves to log history
-WriteData('logs', search[0], lemmaInfos, sourceLang[1], transLang[1])
+WriteData('logs', Page(search[0], lemmaInfos, sourceLang[1], transLang[1]))
 
 # Saves to saved section (-s option)
-if saveTranslation: WriteData('saved', search[0], lemmaInfos, sourceLang[1], transLang[1])
+if saveTranslation: WriteData('saved', Page(search[0], lemmaInfos, sourceLang[1], transLang[1]))
