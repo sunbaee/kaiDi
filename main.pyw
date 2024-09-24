@@ -20,13 +20,9 @@ class StatusException(Exception):
 # Classes for scraping
 
 class Description:
-    def New(self, title, wordtype):
-        self.title = title;
-        self.wordtype = wordtype
-
     def __init__(self, title, wordtype):
-        self.title = title.text
-        self.wordtype = wordtype.text if wordtype else ''
+        self.title = title;
+        self.wordtype = wordtype;
 
     def Display(self, titleColor='\033[00m', wordtypeColor='\033[00m', atStart='', atEnd='\n'):
         wordTypeStr = f'{wordtypeColor}({self.wordtype})\033[00m' if self.wordtype != '' else ''
@@ -35,7 +31,7 @@ class Description:
 class Translation:
     def __init__(self, description, exampleTexts):
         self.description = description
-        self.exampleTexts = list(map(lambda l: l.text, exampleTexts))
+        self.exampleTexts = exampleTexts
     
     def Display(self):
         self.description.Display('\033[0;37m', '\033[3;90m', '\n     ')
@@ -87,11 +83,12 @@ class Lemma:
         }
 
 class Page:
-    def __init__(self, search, lemmas, srcLanguage, trsLanguage):
+    def __init__(self, search, lemmas, srcLanguage, trsLanguage, fastMode):
         self.search = search
         self.lemmas = lemmas
         self.srcLanguage = srcLanguage
         self.trsLanguage = trsLanguage
+        self.fastMode = fastMode
 
     def Dict(self):
         lemmasDict = list(map(lambda l: l.Dict(), self.lemmas))
@@ -100,7 +97,8 @@ class Page:
             "search": self.search,
             "lemmas": lemmasDict,
             "source": self.srcLanguage,
-            "translated": self.trsLanguage
+            "translated": self.trsLanguage,
+            "fastMode": self.fastMode
         }
 
 # Functions that transform html elements into scraping objects of the classes above
@@ -110,17 +108,18 @@ def GetTransDescription(tag):
     titleArr = tag.select('.translation_desc .dictLink')
     wordtypeArr = tag.select('.translation_desc .tag_type')
     
-    return Description(titleArr[0], None if len(wordtypeArr) <= 0 else wordtypeArr[0])
+    return Description(titleArr[0].text, '' if len(wordtypeArr) <= 0 else wordtypeArr[0].text)
 
 def GetTranslation(trans):
         # Gets text examples
         exampleTexts = trans.select('.example_lines > .example > .tag_e > span:not(.tag_e_end):not(.dash)')
 
-        return Translation(GetTransDescription(trans), exampleTexts)
+        return Translation(GetTransDescription(trans), list(map(lambda l: l.text, exampleTexts)))
 
 def GetLemma(lemma):
     # Creates descrition with title and wordtype search
-    description = Description(lemma.select('h2 .dictLink')[0], lemma.select('h2 .tag_wordtype')[0])
+    wordtype = lemma.select('h2 .tag_wordtype')
+    description = Description(lemma.select('h2 .dictLink')[0].text, '' if len(wordtype) <= 0 else wordtype[0].text)
 
     # Gets less common translations
     lessCommons = lemma.select('.lemma_content .translation_group .translation')
@@ -132,6 +131,13 @@ def GetLemma(lemma):
 
     # Add everything to array
     return Lemma(description, transInfos, lessCommonInfo)
+
+# Final output
+def Output(lemmas, mode):
+    for lemma in lemmas:
+        lemma.Display(mode);
+    
+    print();
 
 # Connect to url
 def SoupConnect(fastMode):
@@ -161,23 +167,58 @@ def SoupConnect(fastMode):
 # Writing/Reading/Displaying files
 def WriteData(section, page):
     with shelve.open('data.db', writeback=True) as dataFile:
-        # Doesnt append to database, it is overwriting it
-        dataFile[f'{section}'].append(page.Dict())
+        if not section in dataFile: dataFile[section] = []
 
-        #print(dataFile[f'{section}'])
+        # TO-DO: Sort everything with indexes and alphabetical order (then you can do binary search, but still display it normally)
+        dataFile[section].append(page.Dict());
 
 def GetData(section):
     with shelve.open('data.db') as dataFile:
-        return dataFile[section]
+        if not section in dataFile: return [];
+
+        return dataFile[section];
 
 def DisplayData(section):
-    print(f'\n \033[1;35m(≧∇≦) Displaying your logs:\033[00m\n')
+    searchList = GetData(section)
+    if len(searchList) <= 0: print(f'\n \033[1;35m°՞(ᗒᗣᗕ)՞° You have no information in "{section}".\033[0m'); return;
+
+    print(f'\n \033[1;35m(≧∇≦) Displaying your "{section}":\033[00m\n')
 
     # Gets every page dictionary in logs and displays information about that page
-    for i, page in enumerate(GetData(section)):
+    for i, page in enumerate(searchList):
         # Makes slashes align after 20 chars, unless the search word has more than 20 chars. (min 2 blank spaces)
         blankSpaces = ' ' * (max(0, 20 - len(page['search'])) + 2)
-        print(f"   {i + 1}.\033[0m {page['search']}{blankSpaces}\033[0m\033[2m|\033[0m\033[3m  {page['source']} - {page['translated']}\033[0m")
+        print(f"   {i + 1}.\033[0m {page['search']}{blankSpaces}\033[0m\033[2m|\033[0m\033[3m  {page['source']} - {page['translated']}  \033[0m\033[1m{'*' if page['fastMode'] else ''}\033[0m")
+
+def MatchData(dataSection, search, sourceLang, transLang, fastMode):
+    # TO-DO use binary search to find exact search
+    for page in GetData(dataSection):
+        if page['search'] == search[0] and page['source'] == sourceLang[1] and page['translated'] == transLang[1] and page['fastMode'] == fastMode:
+            # Transforms json into lemmas array to be displayed:
+
+            search = page['search']
+            source = page['source']
+            translated = page['translated']
+
+            # Creates lemmas with dictionary values
+            lemmas = []
+            for lemma in page['lemmas']:
+                curDesc = Description(lemma['description']['title'], lemma['description']['wordtype'])
+                
+                translations = []
+                for trans in lemma['translations']:
+                    transDesc = Description(trans['description']['title'], trans['description']['wordtype'])
+                    exampleTexts = trans['examples']
+                    translations.append(Translation(transDesc, exampleTexts))
+
+                lessCommons = []
+                for lc in lemma['lessCommons']:
+                    lessCommons.append(Description(lc['title'], lc['wordtype']))
+
+                lemmas.append(Lemma(curDesc, translations, lessCommons))
+
+            # Displays and exits            
+            Output(lemmas, page['fastMode']); exit();
 
 def OpenJSON(fileName):
     with open(fileName, "r") as file:
@@ -269,8 +310,7 @@ for i, argument in enumerate(sys.argv[1:]):
             # Shows log of translations
             case 'l': 
                 DisplayData('logs'); DisplayData('saved');
-
-                print(); exit();
+                print('\n\033[1m * : Fastmode ON\033[0m\n'); exit();
             # Changes config file
             case 'c':
                 # Looks for option arguments
@@ -394,17 +434,8 @@ if len(search) > 1:
     exit()
 
 # Checks if translations is saved or is in the logs (loads faster, no need to internet connection)
-
-# Organize everything with indexes and alphabetical order (then you can do binary search)
-for page in GetData('saved'):
-    if page['search'] == search[0] and page['source'] == sourceLang[1] and page['translated'] == transLang[1]:
-        # Transform json into page object and use function display()
-        pass
-
-for page in GetData('logs'):
-    if page['search'] == search[0] and page['source'] == sourceLang[1] and page['translated'] == transLang[1]:
-        # Transform json into page object and use function display()
-        pass
+MatchData('saved', search, sourceLang, transLang, fastMode);
+MatchData('logs',  search, sourceLang, transLang, fastMode);
 
 # Gets linguee html 
 soup = SoupConnect(fastMode)
@@ -426,9 +457,9 @@ if fastMode:
         mainRow = compItem.select('.main_row')[0]
 
         mainTitle = mainRow.select('.main_item')[0]
-        mainType = mainRow.select('.main_wordtype')[0]
+        mainType = mainRow.select('.main_wordtype')
 
-        mainDescription = Description(mainTitle, mainType)
+        mainDescription = Description(mainTitle.text, '' if len(mainType) <= 0 else mainType[0].text)
 
         # Finds all translations of the compItem
         transRow = compItem.select('.translation_row')[0]
@@ -440,17 +471,8 @@ if fastMode:
             # Gets text and filters it into array with title and wordtype of translation
             itemArr = item.text.replace('\r', '').replace('·', '').split('\n')
 
-            # Since Description() receives tag element from bs4 as parameter, its necessary to
-            # transform itemArr into 2 tags. 
-
-            transTitle = soup.new_tag('div')
-            transTitle.string = itemArr[1].strip()
-
-            transType  = soup.new_tag('div')
-            transType.string = itemArr[2].strip()
-
             # Creates a description from tags and appends it to translations array.
-            translations.append(Description(transTitle, transType))
+            translations.append(Description(itemArr[1].strip(), itemArr[2].strip()))
 
         # Uses translations as less commons (because they are just descriptions), creates lemma and appends it to lemmaInfos to be displayed and saved
         lemmaInfos.append(Lemma(mainDescription, [], translations))
@@ -466,13 +488,10 @@ else:
     lemmaInfos = list(map(GetLemma, lemmas))
 
 # Displays result
-for info in lemmaInfos:
-    info.Display(fastMode)
-
-print()
+Output(lemmaInfos, fastMode)
 
 # Saves to log history
-WriteData('logs', Page(search[0], lemmaInfos, sourceLang[1], transLang[1]))
+WriteData('logs', Page(search[0], lemmaInfos, sourceLang[1], transLang[1], fastMode))
 
 # Saves to saved section (-s option)
-if saveTranslation: WriteData('saved', Page(search[0], lemmaInfos, sourceLang[1], transLang[1]))
+if saveTranslation: WriteData('saved', Page(search[0], lemmaInfos, sourceLang[1], transLang[1], fastMode))
