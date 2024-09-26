@@ -164,13 +164,43 @@ def SoupConnect(fastMode):
     
     return BeautifulSoup(res.text, 'lxml')
 
+# Used by others
+
+# Binary search
+def BSearch(search, dicArray, dicParameter):
+    # Starting variables
+    start = 0
+    middle = 0
+    end = len(dicArray) - 1
+
+    while start <= end:
+        middle = (start + end) // 2
+
+        # Gets the search in the position between start and end
+        curString = dicArray[middle][dicParameter]
+
+        # If the current position is bigger than the desired search, restarts from behind current position
+        # and earches after current position otherwise
+        if curString > search:
+            end = middle - 1; continue;
+        if curString  < search:
+            start = middle + 1; continue;
+        
+        return (True, middle);
+
+    return (False, middle);
+    
 # Writing/Reading/Displaying files
 def WriteData(section, page):
     with shelve.open('data.db', writeback=True) as dataFile:
         if not section in dataFile: dataFile[section] = []
 
         # TO-DO: Sort everything with indexes and alphabetical order (then you can do binary search, but still display it normally)
-        dataFile[section].append(page.Dict());
+        bSearch = BSearch(page.search, dataFile[section], 'search')
+        index = bSearch[1] if bSearch[0] else bSearch[1] + 1
+
+        # Inserts element into data (now to array is ordered)
+        dataFile[section].insert(bSearch[1], page.Dict());
 
 def GetData(section):
     with shelve.open('data.db') as dataFile:
@@ -240,24 +270,12 @@ def CheckLanguage(language):
         inDex = 0;
 
     # Binary search to find if the language is in the languages.json file
-    start = 0
-    end = len(languages) - 1
-    while start <= end:
-        # Index of a language in the language file
-        outDex = (start + end) // 2
-        curString = languages[outDex][inDex]
-
-        if curString > language: 
-            end = outDex - 1; continue;
-        elif curString < language: 
-            start = outDex + 1; continue;
-
-        # Returns array containing the language name and its corresponding code
-        return languages[outDex];
+    searchResult = BSearch(language, languages, inDex)
+    if searchResult[0]: return languages[searchResult[1]]
 
     # Exits if language wasn't found
     ExitMSG(f'\033[1;31m /ᐠ - ˕ -マ Language or language code was not found.\033[00m\033[1m\n' + 
-                   f'\n  \033[0m\033[3m* Did you mean "{languages[outDex][inDex]}" ?\033[0m\n ' +
+                   f'\n  \033[0m\033[3m* Did you mean "{languages[searchResult[1]][inDex]}" ?\033[0m\n ' +
                     "\n  Use the ISO language standard for names, or the ISO 639-1 for language codes. " + 
                     "\n  The list of ISO standards is available on: \n\033[00m" + 
                     "\n  \033[3mhttps://en.wikipedia.org/wiki/List_of_ISO_639_language_codes\033[00m")
@@ -310,7 +328,7 @@ for i, argument in enumerate(sys.argv[1:]):
             # Shows log of translations
             case 'l': 
                 DisplayData('logs'); DisplayData('saved');
-                print('\n\033[1m * : Fastmode ON\033[0m\n'); exit();
+                print('\n\033[1m * :\033[0m Searched with \033[1mfastmode\033[0m\n'); exit();
             # Changes config file
             case 'c':
                 # Looks for option arguments
