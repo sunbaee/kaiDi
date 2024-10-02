@@ -195,12 +195,8 @@ def WriteData(section, page):
     with shelve.open('data.db', writeback=True) as dataFile:
         if not section in dataFile: dataFile[section] = []
 
-        # TO-DO: Sort everything with indexes and alphabetical order (then you can do binary search, but still display it normally)
-        bSearch = BSearch(page.search, dataFile[section], 'search')
-        index = bSearch[1] if bSearch[0] else bSearch[1] + 1
-
-        # Inserts element into data (now to array is ordered)
-        dataFile[section].insert(bSearch[1], page.Dict());
+        # Inserts element into data
+        dataFile[section].append(page.Dict());
 
 def GetData(section):
     with shelve.open('data.db') as dataFile:
@@ -221,7 +217,6 @@ def DisplayData(section):
         print(f"   {i + 1}.\033[0m {page['search']}{blankSpaces}\033[0m\033[2m|\033[0m\033[3m  {page['source']} - {page['translated']}  \033[0m\033[1m{'*' if page['fastMode'] else ''}\033[0m")
 
 def MatchData(dataSection, search, sourceLang, transLang, fastMode):
-    # TO-DO use binary search to find exact search
     for page in GetData(dataSection):
         if page['search'] == search[0] and page['source'] == sourceLang[1] and page['translated'] == transLang[1] and page['fastMode'] == fastMode:
             # Transforms json into lemmas array to be displayed:
