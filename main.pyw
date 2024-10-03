@@ -5,6 +5,11 @@ import shelve;
 import json;
 import sys;
 
+# TO-DOS:
+# Add clear logs flag
+# Make it possible to save a log
+# Make config.json be generated instead of brute forced into installation
+
 # Read-only
 propertyNames = ['sourceLanguage', 'translate', 'domain', 'numberLogs']
 
