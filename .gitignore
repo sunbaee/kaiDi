@@ -1,4 +1,4 @@
 *.vscode
 *.venv
-data.db
 config.json
+data.db
