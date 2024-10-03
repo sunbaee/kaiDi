@@ -1,13 +1,12 @@
-# About: 
+## About: 
 
 A terminal translator made in python.
 
 Here's a small video showing its usability:
 
-# Dependencies:
-    lxml, bs4, requests
+### Dependencies: lxml, bs4, requests
 
-# Instalation:
+## Instalation:
 
 1. Clone this repository using git clone https://github.com/sunbaee/Translator.git
 
