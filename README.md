@@ -2,7 +2,10 @@
 
 A terminal translator made in python.
 
-Here's a small video showing its usability.
+Here's a small video showing its usability:
+
+# Dependencies:
+    lxml, bs4, requests
 
 # Instalation:
 
@@ -10,12 +13,11 @@ Here's a small video showing its usability.
 
 2. Enter the directory named kaiDi.
 
-3. Open a terminal and install the following dependencies using the command pip install {dependency} or use pip install {dep1} {dep2} {...}
+3. Open a terminal and install the necessary dependencies using the following command:
 
-_Switch the values in brackets {} with one dependency name._
-
-## Dependencies: 
-    lxml, bs4, requests
+```bash
+pip install lxml bs4 requests
+```
 
 # Usability:
 
