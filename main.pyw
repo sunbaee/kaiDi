@@ -5,9 +5,6 @@ import shelve;
 import json;
 import sys;
 
-# TO-DOS:
-# Make config.json be generated instead of brute forced into installation
-
 # Read-only
 propertyNames = ['sourceLanguage', 'translate', 'domain']
 
@@ -169,8 +166,9 @@ def SoupConnect(fastMode):
 
 # Used by others
 
-# Binary search
 def BSearch(search, dicArray, dicParameter):
+    # Binary search
+
     # Starting variables
     start = 0
     middle = 0
@@ -192,7 +190,17 @@ def BSearch(search, dicArray, dicParameter):
         return (True, middle);
 
     return (False, middle);
+
+def SetProperties(properties, currentConfig):
+    temp = currentConfig;
+    for i, prop in enumerate(properties): 
+        temp[prop[0]] = prop[1]
+
+        argumentString = f'\033[3;37m"{prop[1][0]} ({prop[1][1]})"\033[00m.' if prop[0] == 'sourceLanguage' or prop[0] == 'translate' else f'\033[3;37m"{prop[1]}"\033[00m.';
+        print(f'   \033[1;37m{i + 1}.\033[00m\033[3;37m"{prop[0]}"\033[00m was set to {argumentString}')
     
+    return temp;
+
 # Writing/Reading/Displaying files
 def WriteData(section, page):
     with shelve.open('data.db', writeback=True) as dataFile:
@@ -217,7 +225,7 @@ def DisplayData(section):
     for i, page in enumerate(searchList):
         # Makes slashes align after 20 chars, unless the search word has more than 20 chars. (min 2 blank spaces)
         blankSpaces = ' ' * (max(0, 20 - len(page['search'])) + 2)
-        print(f"   {i + 1}.\033[0m {page['search']}{blankSpaces}\033[0m\033[2m|\033[0m\033[3m  {page['source']} - {page['translated']}  \033[0m\033[1m{'*' if page['fastMode'] else ''}\033[0m")
+        print(f"   {(i + 1):03d}.\033[0m {page['search']}{blankSpaces}\033[0m\033[2m|\033[0m\033[3m  {page['source']} - {page['translated']}  \033[0m\033[1m{'*' if page['fastMode'] else ''}\033[0m")
 
 def MatchData(dataSection, search, sourceLang, transLang, fastMode):
     for page in GetData(dataSection):
@@ -252,8 +260,13 @@ def MatchData(dataSection, search, sourceLang, transLang, fastMode):
     return (False, [])
 
 def OpenJSON(fileName):
-    with open(fileName, "r") as file:
-        return json.load(file);
+    try: 
+        with open(fileName, "r") as file:
+            return json.load(file);
+    except:
+        print('\n \033[1;35m(˶˃⤙˂˶)\033[0m To start translating, update the translation');
+        print('         config using \033[1mtrs -u \033[0m.')
+        ExitMSG('        \033[1mExample:\033[0m \033[3mtrs -u en:fr:.com\033[0m')
 
 # Receives language or language code, checks if it exists and returns the correct language with its iso639 language code.
 def CheckLanguage(language):
@@ -353,7 +366,7 @@ for i, argument in enumerate(sys.argv[1:]):
                         
                         # Creates list with booleans depending 
                         # if the propertyName matches one of the strings in propertyNames,
-                        # if no string matches the propertyName, than the propertyName inserted is invalid.
+                        # if no string matches the propertyName, then the propertyName inserted is invalid.
                         correctStr = False
                         for k in list(map(lambda x: prop[0] == x, propertyNames)):
                             if k: correctStr = True
@@ -371,29 +384,34 @@ for i, argument in enumerate(sys.argv[1:]):
 
                             # Add string to correponding property
                             properties.append([propertyNames[i], arg])
-                
                 # Checks if languages are correct
                 for prop in properties:
-                    if prop[0] == 'sourceLanguage' or prop[0] == 'translate':
-                        prop[1] = CheckLanguage(prop[1])
+                    if prop[0] == 'sourceLanguage' or prop[0] == 'translate': prop[1] = CheckLanguage(prop[1])
 
-                # Updates config file
-                with open('config.json', "r+") as file:
-                    config = json.load(file)
+                try:
+                    # Updates config file 
+                    with open('config.json', "r+") as file:
+                        config = json.load(file)
 
-                    # Writes all properties and displays changes
-                    print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The following properties were changed: \n')
-                    for i, prop in enumerate(properties): 
-                        config[prop[0]] = prop[1]
+                        # Writes all properties and displays changes
+                        print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The following properties were changed: \n')
+                        config = SetProperties(properties, config);
 
-                        argumentString = f'\033[3;37m"{prop[1][0]} ({prop[1][1]})"\033[00m.' if prop[0] == 'sourceLanguage' or prop[0] == 'translate' else f'\033[3;37m"{prop[1]}"\033[00m.';
-                        print(f'   \033[1;37m{i + 1}.\033[00m\033[3;37m"{prop[0]}"\033[00m was changed to {argumentString}')
+                        file.seek(0)
+                        json.dump(config, file)
+                        file.truncate()
+                except:
+                    # Creates config file if theres no config file
+                    with open('config.json', 'w+') as file:
+                        if len(properties) < 3: ExitMSG(' \033[1;31m( ｡ •`ᴖ´• ｡)\033[0m You need to set all config options: \033[3msourceLanguage, translate and domain.\033[0m')
+                        
+                        nullConfig = {"sourceLanguage": "", "translate": "", "domain": "", "fastTranslation": False}
 
-                    file.seek(0)
-                    json.dump(config, file)
-                    file.truncate()
+                        print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The configuration was set successfully: \n')
+                        config = SetProperties(properties, nullConfig);
 
-                # If there's no search, creates new line and exit()
+                        json.dump(config, file); file.truncate();
+                
                 if (len(search) == 0): print(); exit()
             # Display options from the configuration file
             case 'i':
@@ -451,26 +469,6 @@ transLang = config['translate']
 
 dotDomain = config['domain']
 fastMode = config['fastTranslation']
-
-# Translates full texts (more than 1 word)
-if len(search) > 1:
-    # Transforms array in string
-    searchText = ''
-    for i, word in enumerate(search): 
-        fStr = f'{word} '
-        if i == len(search) - 1: fStr = word;
-
-        searchText += fStr
-    
-    deeplUrl = f'https://www.deepl.com/en/translator#{sourceLang[1]}/{transLang[1]}/{searchText}'
-
-    soup = SoupConnect(deeplUrl)
-    #[aria-labelledby]="translation-target-heading"
-    textTranslation = soup.select('div')
-
-    for div in textTranslation:
-        print(div.text)
-    exit()
 
 # Checks if translations is saved or is in the logs (loads faster, no need to internet connection)
 logMatch = MatchData('logs',  search, sourceLang, transLang, fastMode);
