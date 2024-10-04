@@ -18,6 +18,6 @@ Here's a small video showing its usability:
 pip install lxml bs4 requests
 ```
 
-# Usability:
+## Usability:
 
 You can run the program using the terminal command python main.pyw when inside the kaiDi folder.

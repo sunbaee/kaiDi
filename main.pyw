@@ -6,12 +6,10 @@ import json;
 import sys;
 
 # TO-DOS:
-# Add clear logs flag
-# Make it possible to save a log
 # Make config.json be generated instead of brute forced into installation
 
 # Read-only
-propertyNames = ['sourceLanguage', 'translate', 'domain', 'numberLogs']
+propertyNames = ['sourceLanguage', 'translate', 'domain']
 
 # Important variables
 search = []
@@ -247,12 +245,15 @@ def MatchData(dataSection, search, sourceLang, transLang, fastMode):
 
                 lemmas.append(Lemma(curDesc, translations, lessCommons))
 
-            # Displays and exits            
-            Output(lemmas, page['fastMode']); exit();
+            # Displays and returns true
+            Output(lemmas, page['fastMode'])
+            return (True, lemmas)
+    
+    return (False, [])
 
 def OpenJSON(fileName):
     with open(fileName, "r") as file:
-        return json.load(file)
+        return json.load(file);
 
 # Receives language or language code, checks if it exists and returns the correct language with its iso639 language code.
 def CheckLanguage(language):
@@ -296,22 +297,28 @@ def Help():
     print(" \033[1mOptions: \033[0m\n")
     print("  -l : Shows log of translations and saved translations.")
     print("  -s : Saves the translation to be used later.")
-    print("  -d : Displays options from the config file")
-    print("  -c : Changes config file options.")
+    print("  -c : Clears logs or saved translations.")
+    print("  -i : Displays config information.")
+    print("  -u : Updates translation options.")
     print("  -f : Toggles on/off fast mode.")
     print("  -h : Shows this help message.\n")
     print("\033[1mExtended Details:\033[0m\n")
-    print(" -f :  Enables/Disables fast mode. Fast mode allows you to search when the linguee website responds with an \033[1;31mHTTP 429\033[0m error,")
-    print("       but its translations are very limited, not containing examples.\n")
-    print(" -c :  Option used to change the configuration of the script, ")
+    print(" -c :  Clears one section of the translations that are shown ")
+    print("       in the -l option. Defaults to \033[3m'logs'.\033[0m")
+    print("         \033[1mSyntax: \033[0m\033[3m-c section\033[0m")
+    print("\n             \033[3mExample:\033[0m -c saved\n")
+    print(" -u :  Option used to update the configuration of the script, ")
     print("       you can use two syntaxes for this option: ")
-    print("         \033[1mSyntax 1\033[0m: \033[3mOPT1=ARG1 OPT2=ARG2 ...\033[0m ")
-    print("\n            \033[3mExamples:\033[0m sourceLanguage=en translate=de\n")
-    print("         \033[1mSyntax 2:\033[0m \033[3mARG1:ARG2:ARG3...\033[0m ")
-    print("             In this syntax the options are in the order displayed using the -d option ")
+    print("         \033[1mSyntax 1\033[0m: \033[3m-u OPT1=ARG1 OPT2=ARG2 ...\033[0m ")
+    print("\n             \033[3mExamples:\033[0m sourceLanguage=en translate=de\n")
+    print("         \033[1mSyntax 2:\033[0m \033[3m-u ARG1:ARG2:ARG3...\033[0m ")
+    print("             In this syntax the options are in the order displayed using the -i option ")
     print('             Its necessary at least one \033[3m":"\033[0m to use this syntax')
     print("\n             \033[3mExamples:\033[0m en:pt:.com")
     print("                       pt:\n")
+    print(" -f :  Enables/Disables fast mode. Fast mode allows you to search when the linguee website ")
+    print("       responds with an \033[1mHTTP 429\033[0m error, but its translations ")
+    print("       are very limited, not containing examples.\n")
     exit()
 
 # Checks arguments
@@ -329,8 +336,8 @@ for i, argument in enumerate(sys.argv[1:]):
             case 'l': 
                 DisplayData('logs'); DisplayData('saved');
                 print('\n\033[1m * :\033[0m Searched with \033[1mfastmode\033[0m\n'); exit();
-            # Changes config file
-            case 'c':
+            # Updates config file
+            case 'u':
                 # Looks for option arguments
                 if len(sys.argv) <= i + 2: MissingArgument('option argument')
 
@@ -350,7 +357,7 @@ for i, argument in enumerate(sys.argv[1:]):
                         correctStr = False
                         for k in list(map(lambda x: prop[0] == x, propertyNames)):
                             if k: correctStr = True
-                        if not correctStr: ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Incorrect config option name. Use -d to see options names.\033[00m")
+                        if not correctStr: ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Invalid config option name. Use -d to see options names.\033[00m")
                         
                         properties.append(prop)
                     else:
@@ -389,16 +396,30 @@ for i, argument in enumerate(sys.argv[1:]):
                 # If there's no search, creates new line and exit()
                 if (len(search) == 0): print(); exit()
             # Display options from the configuration file
-            case 'd':
+            case 'i':
                 config = OpenJSON('config.json')
                 print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[1mDisplaying useful information:\033[00m\n')
                 print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0]} \033[2m({config['sourceLanguage'][1]})\033[00m')
                 print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} \033[2m({config['translate'][1]})\033[00m\n')
                 print(  f' \033[1;35mdomain:\033[00m {config['domain']}')
-                print(  f' \033[1;35mnumberLogs:\033[00m {config['numberLogs']}\n')
-                print(  f' \033[1m* Fast Mode:\033[00m {config['fastTranslation']}\n')
+                print(f'\n \033[1m* Fast Mode:\033[00m {config['fastTranslation']}\n')
 
                 exit()
+            # Clears logs or saved logs
+            case 'c':
+                section = ''
+                # Checks if theres no option argument (default to 'logs')
+                if len(sys.argv) <= i + 2 or sys.argv[i+2][0] == '-': section = 'logs'
+                else: 
+                    # Checks if option argument is in logs or saved
+                    possibleSections = ['logs', 'saved'];
+                    for sec in possibleSections: 
+                        if sys.argv[i+2] == sec: section = sec; break;
+
+                    if section == '': ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Invalid section name. The available sections are 'logs' and 'saved'.\033[00m")
+
+                with shelve.open('data.db') as dataFile: dataFile[section] = []
+                ExitMSG(f" \033[1;34mᕙ( •̀ ᗜ •́ )ᕗ\033[0m  The section \033[3m'{section}'\033[0m was cleared.")
             # Saves translation to be used later
             case 's': saveTranslation = True;
             # Toogle fast translation
@@ -413,15 +434,15 @@ for i, argument in enumerate(sys.argv[1:]):
                     file.seek(0)
                     json.dump(config, file)
                     file.truncate()
-
-                # If there's no search, creates new line and exit()
-                if (len(search) == 0): print(); exit()
             # Default message
             case _: ExitMSG("\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m")
-    
+
     # Get all arguments before the first option (all text to be translated)
     if not usingOptions: search.append(argument);
-    
+
+# If there's no search, creates new line and exit()
+if (len(search) == 0): print(); exit()
+
 # Get values from json file
 config = OpenJSON('config.json')
 
@@ -452,8 +473,15 @@ if len(search) > 1:
     exit()
 
 # Checks if translations is saved or is in the logs (loads faster, no need to internet connection)
-MatchData('saved', search, sourceLang, transLang, fastMode);
-MatchData('logs',  search, sourceLang, transLang, fastMode);
+logMatch = MatchData('logs',  search, sourceLang, transLang, fastMode);
+savMatch = MatchData('saved', search, sourceLang, transLang, fastMode);
+
+# Saves 'log' to 'saved' if saveTranslation is set to True, exits if the translation is matched
+if logMatch[0]: 
+    if saveTranslation: WriteData('saved', Page(search[0], logMatch[1], sourceLang[1], transLang[1], fastMode))
+    exit();
+
+if savMatch[0]: exit();
 
 # Gets linguee html 
 soup = SoupConnect(fastMode)
