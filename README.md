@@ -1,14 +1,16 @@
-## About: 
+# kaiDi
 
-A terminal translator made in python.
+_A terminal translator/dictionary made in python._
 
-Here's a small video showing its usability:
+The version of python used was _python 3.12_.
 
-### Dependencies: lxml, bs4, requests
+## 
+
+Here's a small video showing its usability: 
 
 ## Instalation:
 
-1. Clone this repository using git clone https://github.com/sunbaee/Translator.git
+1. Clone this repository using git clone https://github.com/sunbaee/kaiDi.git
 
 2. Enter the directory named kaiDi.
 
@@ -18,6 +20,11 @@ Here's a small video showing its usability:
 pip install lxml bs4 requests
 ```
 
+4. If everything 
+
 ## Usability:
 
-You can run the program using the terminal command python main.pyw when inside the kaiDi folder.
+You can run the program using the following terminal command when inside the kaiDi folder.
+```bash
+python main.pyw 
+```
