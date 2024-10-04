@@ -5,6 +5,9 @@ import shelve;
 import json;
 import sys;
 
+# TO-DO: 
+# Create instalation: bash script that opens this python script for linux
+
 # Read-only
 propertyNames = ['sourceLanguage', 'translate', 'domain']
 
