@@ -51,13 +51,13 @@ _Use the word you want to translate instead of translation in the command above.
   ```
 
   5. Add the program to your shell:
-  <details>
-  <summary>Bash</summary>
-  > Add this line to the end of your config file (`~/.bashrc`):
-  > ```bash
-  > export PATH="usr/local/bin:$PATH"
-  > ```
-  </details>
+    <details>
+    <summary>Bash</summary>
+    > Add this line to the end of your config file (`~/.bashrc`):
+    > ```bash
+    > export PATH="usr/local/bin:$PATH"
+    > ```
+    </details>
 
 If everything went right, you should be able to use the program!
 
