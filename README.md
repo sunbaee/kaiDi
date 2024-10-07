@@ -81,12 +81,17 @@ kdi -u sourceLanguage:targetLanguage:lingueeDomain
 ```
 _Use your preferred options instead of the words shown above._
 
-<br>Here's a configuration example for **english-french** translation:
+<details>
+<summary>Example</summary>
+  
+  > Here's a configuration example for **english-french** translation:
+  >   
+  > ```bash
+  > kdi -u english:french:.com
+  > ```
 
-```bash
-kdi -u english:french:.com
-```
+</details>
+
 _Note: its possible to use the full language name, but its also possible to use any [ISO639 language code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) for the languages._
 
-<br> _For example: **en for english** and **fr for french**._
-
+_**For example**: en, fr, de, pt, ..._
