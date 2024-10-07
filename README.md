@@ -17,26 +17,47 @@ https://github.com/user-attachments/assets/bd772dbe-65d4-4c0c-88d0-4b348d18df56
 
 ## Usability
 
-You can run the program using the following terminal command when inside the kaiDi folder.
+You can run the program using the following shell command.
 ```bash
-python main.pyw {translation}
+kdi translation
 ```
 
-_Use the word you want to translate instead of {translation} in the command above._
+_Use the word you want to translate instead of translation in the command above._
 
 ## Installation
+  0. Select a directory where you want to install the script:
+  ```bash
+  cd your/installation/directory/
+  ```
 
-1. Open the terminal and clone this repository using the following command:
-```bash
-git clone https://github.com/sunbaee/kaiDi.git
-```
-2. Enter the directory named kaiDi.
+  1. Open the terminal and clone this repository using the following command:
+  ```bash
+  git clone https://github.com/sunbaee/kaiDi.git
+  ```
+  2. Enter the directory named kaiDi:
+  ```bash
+  cd kaiDi
+  ```
 
-3. Install the necessary dependencies using the following command:
+  3. Run the following command to make the installation script an executable:
 
-```bash
-pip install lxml bs4 requests
-```
+  ```bash
+  chmod +x install.sh
+  ```
+
+  4. Install the program:
+  ```bash
+  sudo ./install.sh
+  ```
+
+  5. Add the program to your shell:
+  <details>
+  <summary>Bash</summary>
+  > Add this line to the end of your config file (`~/.bashrc`):
+  > ```bash
+  > export PATH="usr/local/bin:$PATH"
+  > ```
+  </details>
 
 If everything went right, you should be able to use the program!
 
@@ -45,13 +66,14 @@ If everything went right, you should be able to use the program!
 The first time you try to translate something, you'll be prompted to set the configuration file.
 You can use the -u option to update the configuration file:
 ```bash
-python main.pyw -u {sourceLanguage}:{targetLanguage}:{lingueeDomain}
+kdi -u sourceLanguage:targetLanguage:lingueeDomain
 ```
-_Use your preferred options instead of the words that are in brackets {}._
+_Use your preferred options instead of the words shown above._
 
 <br>Here's a configuration example for **english-french** translation:
+
 ```bash
-python main.pyw -u english:french:.com
+kdi -u english:french:.com
 ```
 _Note: its possible to use the full language name, but its also possible to use any ISO639 language code for the languages._
 
