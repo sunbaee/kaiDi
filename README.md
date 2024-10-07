@@ -45,27 +45,17 @@ Here are some of the ways you can use the program in the terminal:
       cd your/installation/directory
       ```
 
-  2. **Open the terminal and clone this repository using the following command**:
+  1. **Open the terminal and clone this repository using the following command**:
       ```bash
       git clone https://github.com/sunbaee/kaiDi.git
       ```
-  2. **Enter the directory named kaiDi**:
+
+  3. **Install the program**:
       ```bash
-      cd kaiDi
+      cd kaiDi && sudo ./install.sh
       ```
 
-  3. **Run the following command to make the installation script an executable**:
-
-      ```bash
-      chmod +x install.sh
-      ```
-
-  4. **Install the program**:
-      ```bash
-      sudo ./install.sh
-      ```
-
-  5. **Add the program to your shell**:
+  4. **Add the program to your shell**:
       <details>
       <summary>Bash</summary>
         
