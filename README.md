@@ -11,6 +11,11 @@ It has some extra functions such as:
 
 <br>_The version of python used was python 3.12_.
 
+[Preview](#preview)
+[Usability](#usability)
+[Installation](#installation)
+[Configuration](#configuration)
+
 ## Preview
 
 https://github.com/user-attachments/assets/bd772dbe-65d4-4c0c-88d0-4b348d18df56
@@ -25,39 +30,42 @@ kdi translation
 _Use the word you want to translate instead of translation in the command above._
 
 ## Installation
-  0. Select a directory where you want to install the script:
+
+  0. **Select a directory where you want to install the script**:
   ```bash
   cd your/installation/directory/
   ```
 
-  1. Open the terminal and clone this repository using the following command:
+  1. **Open the terminal and clone this repository using the following command**:
   ```bash
   git clone https://github.com/sunbaee/kaiDi.git
   ```
-  2. Enter the directory named kaiDi:
+  2. **Enter the directory named kaiDi**:
   ```bash
   cd kaiDi
   ```
 
-  3. Run the following command to make the installation script an executable:
+  3. **Run the following command to make the installation script an executable**:
 
   ```bash
   chmod +x install.sh
   ```
 
-  4. Install the program:
+  4. **Install the program**:
   ```bash
   sudo ./install.sh
   ```
 
-  5. Add the program to your shell:
-    <details>
-    <summary>Bash</summary>
-    > Add this line to the end of your config file (`~/.bashrc`):
-    > ```bash
-    > export PATH="usr/local/bin:$PATH"
-    > ```
-    </details>
+  5. **Add the program to your shell**:
+      <details>
+      <summary>Bash</summary>
+        
+      > Add this line to the end of your config file ( `~/.bashrc` ):
+      > ```sh
+      > export PATH="usr/local/bin:$PATH" 
+      > ```
+    
+      </details>
 
 If everything went right, you should be able to use the program!
 
