@@ -268,8 +268,8 @@ def OpenJSON(fileName):
             return json.load(file);
     except:
         print('\n \033[1;35m(˶˃⤙˂˶)\033[0m To start translating, update the translation');
-        print('         config using \033[1mtrs -u \033[0m.')
-        ExitMSG('        \033[1mExample:\033[0m \033[3mtrs -u en:fr:.com\033[0m')
+        print('         config using \033[1mkdi -u \033[0m.')
+        ExitMSG('        \033[1mExample:\033[0m \033[3mkdi -u en:fr:.com\033[0m')
 
 # Receives language or language code, checks if it exists and returns the correct language with its iso639 language code.
 def CheckLanguage(language):
@@ -309,7 +309,7 @@ def MissingArgument(customMessage='argument'):
 def Help():
     print("\n \033[1mDescription\033[0m: A script that translates things directly from the terminal.")
     print("              (˶˃ ᵕ ˂˶) .ᐟ.ᐟ \n")
-    print(" \033[1mSyntax\033[0m: trs yourwordhere [options]\n")
+    print(" \033[1mSyntax\033[0m: kdi yourwordhere [options]\n")
     print(" \033[1mOptions: \033[0m\n")
     print("  -l : Shows log of translations and saved translations.")
     print("  -s : Saves the translation to be used later.")
