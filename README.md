@@ -9,6 +9,8 @@ It has some extra functions such as:
   2. **Saving translations** to acess them faster (not needing internet connection).
   3. A **fast mode** that shows some suggestions with the translation.
 
+<br>
+
 _The version of python used was python 3.12._
 
 <div align="right">
@@ -50,12 +52,12 @@ Here are some of the ways you can use the program in the terminal:
       git clone https://github.com/sunbaee/kaiDi.git
       ```
 
-  3. **Install the program**:
+  2. **Install the program**:
       ```bash
       cd kaiDi && sudo ./install.sh
       ```
 
-  4. **Add the program to your shell**:
+  3. **Add the program to your shell**:
       <details>
       <summary>Bash</summary>
         
@@ -65,6 +67,8 @@ Here are some of the ways you can use the program in the terminal:
       > ```
     
       </details>
+      
+<br>
 
 If everything went right, you should be able to use the program!
 
@@ -82,7 +86,7 @@ _Use your preferred options instead of the words shown above._
 ```bash
 kdi -u english:french:.com
 ```
-_Note: its possible to use the full language name, but its also possible to use any ISO639 language code for the languages._
+_Note: its possible to use the full language name, but its also possible to use any [ISO639 language code](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) for the languages._
 
 <br> _For example: **en for english** and **fr for french**._
 
