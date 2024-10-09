@@ -59,18 +59,38 @@ Here are some of the ways you can use the program in the terminal:
 
   3. **Add the program to your shell**:
       <details>
-      <summary>Bash</summary>
+        <summary>Bash</summary>
         
       > Add this line to the end of your config file ( `~/.bashrc` ):
       > ```sh
-      > export PATH="usr/local/bin:$PATH" 
+      > export PATH="/usr/local/bin:$PATH" 
       > ```
     
       </details>
+
+      <details>
+        <summary>Fish</summary>
+
+        > Run this command in the shell:
+        > ```sh
+        > fish_add_path /usr/local/bin
+        > ```
+        
+      </details>
       
+      <details>
+        <summary>Zsh</summary>
+        
+        > Add this line to the end of your config file ( `~/.zshrc` ):
+        > ```sh
+        > path+=('/usr/local/bin')
+        > export PATH
+        > ```
+        
+      </details>
 <br>
 
-If everything went right, you should be able to use the program!
+_If everything went right, you should be able to use the program!_
 
 ## Configuration
 
