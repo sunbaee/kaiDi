@@ -51,42 +51,55 @@ Here are some of the ways you can use the program in the terminal:
       ```bash
       git clone https://github.com/sunbaee/kaiDi.git
       ```
-
+  
   2. **Install the program**:
-      ```bash
-      cd kaiDi && sudo ./install.sh
-      ```
-
-  3. **Add the program to your shell**:
       <details>
-        <summary>Bash</summary>
+      <summary>Linux</summary>
         
-      > Add this line to the end of your config file ( `~/.bashrc` ):
-      > ```sh
-      > export PATH="/usr/local/bin:$PATH" 
-      > ```
-    
-      </details>
-
-      <details>
-        <summary>Fish</summary>
-
-        > Run this command in the shell:
-        > ```sh
-        > fish_add_path /usr/local/bin
-        > ```
-        
-      </details>
+      >
+      > **Run this command to install:**
+      >  ```bash
+      >  cd kaiDi && sudo ./install.sh
+      >  ```
+      > 
+      > **Add the program to your shell**:
+      > <details>
+      >   <summary>Bash</summary>
+      >   
+      >    > Add this line to the end of your config file ( `~/.bashrc` ):
+      >    > ```sh
+      >    > export PATH="/usr/local/bin:$PATH" 
+      >    > ```
+      >
+      > </details>
+      >
+      > <details>
+      >   <summary>Fish</summary>
+      >  
+      >   > Run this command in the shell:
+      >   > ```sh
+      >   > fish_add_path /usr/local/bin
+      >   > ```
+      >  
+      > </details>
+      > <details>
+      >   <summary>Zsh</summary>
+      >  
+      >   > Add this line to the end of your config file ( `~/.zshrc` ):
+      >   > ```sh
+      >   > path+=('/usr/local/bin')
+      >   > export PATH
+      >   > ```
+      > </details> 
+      >  
       
+      </details>
+
       <details>
-        <summary>Zsh</summary>
-        
-        > Add this line to the end of your config file ( `~/.zshrc` ):
-        > ```sh
-        > path+=('/usr/local/bin')
-        > export PATH
-        > ```
-        
+        <summary>Windows</summary>
+
+        > I will write the rest later. :0
+        > 
       </details>
 <br>
 
