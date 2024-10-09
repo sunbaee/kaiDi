@@ -5,9 +5,6 @@ import shelve;
 import json;
 import sys;
 
-# TO-DO: 
-# Create instalation: bash script that opens this python script for linux
-
 # Read-only
 propertyNames = ['sourceLanguage', 'translate', 'domain']
 
@@ -198,9 +195,6 @@ def SetProperties(properties, currentConfig):
     temp = currentConfig;
     for i, prop in enumerate(properties): 
         temp[prop[0]] = prop[1]
-
-        argumentString = f'\033[3;37m"{prop[1][0]} ({prop[1][1]})"\033[00m.' if prop[0] == 'sourceLanguage' or prop[0] == 'translate' else f'\033[3;37m"{prop[1]}"\033[00m.';
-        print(f'   \033[1;37m{i + 1}.\033[00m\033[3;37m"{prop[0]}"\033[00m was set to {argumentString}')
     
     return temp;
 
@@ -397,7 +391,6 @@ for i, argument in enumerate(sys.argv[1:]):
                         config = json.load(file)
 
                         # Writes all properties and displays changes
-                        print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The following properties were changed: \n')
                         config = SetProperties(properties, config);
 
                         file.seek(0)
