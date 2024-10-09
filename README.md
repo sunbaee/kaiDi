@@ -26,7 +26,7 @@ _The version of python used was python 3.12._
 
 ## Preview
 
-https://github.com/user-attachments/assets/2a08d18d-9a38-4d60-a653-4589e6f9efbe
+https://github.com/user-attachments/assets/785dfdc9-5e40-4efa-9f19-e0bc453aeea1
 
 ## Usability
 
