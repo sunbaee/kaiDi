@@ -9,6 +9,10 @@ deactivate
 
 DIREC="$(pwd)"
 
+if ! [ -d /usr/local/bin ]; then
+    mkdir /usr/local/bin;
+fi;
+
 cd /usr/local/bin
 
 # Creating executable file to open the program in the terminal
