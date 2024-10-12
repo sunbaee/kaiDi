@@ -152,6 +152,8 @@ def SoupConnect(fastMode):
         res = requests.get(url)
 
         if res.status_code != 200: raise StatusException(res.status_code)
+    except requests.ConnectionError as error:
+        ExitMSG(f'\033[1;31m (っ◞‸◟ c) An internet connection error ocurred.\033[0m')
     except requests.exceptions.RequestException as error:
         ExitMSG(f'\033[1;31m (っ◞‸◟ c) An error ocurred:\033[00m\n\n   {error}')
     except StatusException as error:
