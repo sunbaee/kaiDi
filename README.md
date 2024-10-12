@@ -31,13 +31,13 @@ https://github.com/user-attachments/assets/785dfdc9-5e40-4efa-9f19-e0bc453aeea1
 ## Usability
 
 Here are some of the ways you can use the program in the terminal:
-  ```sh
-  kdi translation       # translates "translation" according to your configuration.
-  
-  kdi -u en:de          # switches translation to english - german
-  kdi -i                # displays current configuration.
-  kdi -l                # displays log. 
-  ```
+<pre>
+kdi translation       # translates "translation" according to your configuration.
+
+kdi -u en:de          # switches translation to english - german
+kdi -i                # displays current configuration.
+kdi -l                # displays log. 
+</pre>
 
 ## Installation
 
