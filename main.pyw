@@ -405,7 +405,7 @@ for i, argument in enumerate(sys.argv[1:]):
                         
                         nullConfig = {"sourceLanguage": "", "translate": "", "domain": "", "fastTranslation": False}
 
-                        print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The configuration was set successfully: \n')
+                        print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The configuration was set successfully:')
                         config = SetProperties(properties, nullConfig);
 
                         json.dump(config, file); file.truncate();
