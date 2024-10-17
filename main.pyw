@@ -224,7 +224,7 @@ def DisplayData(section):
     for i, page in enumerate(searchList):
         # Makes slashes align after 20 chars, unless the search word has more than 20 chars. (min 2 blank spaces)
         blankSpaces = ' ' * (max(0, 20 - len(page['search'])) + 2)
-        print(f"   {(i + 1):03d}.\033[0m {page['search']}{blankSpaces}\033[0m\033[2m|\033[0m\033[3m  {page['source']} - {page['translated']}  \033[0m\033[1m{'*' if page['fastMode'] else ''}\033[0m")
+        print(f"   \033[2m{(i + 1):03d} |\033[0m {page['search']}{blankSpaces}\033[2m|\033[0m\033[2m  {page['source']} - {page['translated']}  {'*' if page['fastMode'] else ''}\033[0m")
 
 def MatchData(dataSection, search, sourceLang, transLang, fastMode):
     for page in GetData(dataSection):
