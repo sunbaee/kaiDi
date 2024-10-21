@@ -9,6 +9,7 @@ deactivate
 
 DIREC="$(pwd)"
 
+# Checks if /usr/local/bin folder exists, if not, creates it. 
 if ! [ -d /usr/local/bin ]; then
     mkdir /usr/local/bin;
 fi;

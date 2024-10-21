@@ -2,25 +2,25 @@
 
 class Description:
     def __init__(self, title, wordtype):
-        self.title = title;
-        self.wordtype = wordtype;
+        self.title : str = title;
+        self.wordtype : str = wordtype;
 
-    def Display(self, titleColor='\033[00m', wordtypeColor='\033[00m', atStart='', atEnd='\n'):
+    def Display(self, titleColor='\033[00m', wordtypeColor='\033[00m', atStart='', atEnd='\n') -> None:
         wordTypeStr = f'{wordtypeColor}({self.wordtype})\033[00m' if self.wordtype != '' else ''
         print(f'{atStart}{titleColor}{self.title}\033[00m {wordTypeStr}', end=atEnd)
 
 class Translation:
     def __init__(self, description, exampleTexts):
-        self.description = description
-        self.exampleTexts = exampleTexts
+        self.description : Description = description
+        self.exampleTexts : list[str] = exampleTexts
     
-    def Display(self):
+    def Display(self) -> None:
         self.description.Display('\033[0;37m', '\033[3;90m', '\n     ')
 
         for example in self.exampleTexts:
             print(f'       \033[0;34m{example.strip()}\033[00m')
 
-    def Dict(self):
+    def Dict(self) -> dict:
         return {
             'description': self.description.__dict__,
             'examples': self.exampleTexts
@@ -28,11 +28,11 @@ class Translation:
 
 class Lemma:
     def __init__(self, description, translations, lessCommons):
-        self.description = description
-        self.lessCommons = lessCommons
-        self.translations = translations
+        self.description : Description = description
+        self.lessCommons : list[Description] = lessCommons
+        self.translations : list[Translation] = translations
     
-    def Display(self, fastMode=False):
+    def Display(self, fastMode=False) -> None:
         self.description.Display('\033[1;32m', '\033[3;90m', '\n   ', '')
 
         for info in self.translations:
@@ -48,7 +48,7 @@ class Lemma:
 
             lessCommon.Display('\033[0;37m', '\033[3;90m', '', ' - ')
 
-    def Dict(self):
+    def Dict(self) -> dict:
         transDictArr = []
         for trans in self.translations:
             transDictArr.append(trans.Dict())
@@ -65,13 +65,14 @@ class Lemma:
 
 class Page:
     def __init__(self, search, lemmas, srcLanguage, trsLanguage, fastMode):
-        self.search = search
-        self.lemmas = lemmas
-        self.srcLanguage = srcLanguage
-        self.trsLanguage = trsLanguage
-        self.fastMode = fastMode
+        self.srcLanguage : str = srcLanguage
+        self.trsLanguage : str = trsLanguage
+        self.search : str = search
 
-    def Dict(self):
+        self.lemmas : list[Lemma] = lemmas
+        self.fastMode : bool = fastMode
+
+    def Dict(self) -> dict:
         lemmasDict = list(map(lambda l: l.Dict(), self.lemmas))
 
         return {
