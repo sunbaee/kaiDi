@@ -355,8 +355,10 @@ def Main() -> None:
         # Finds all "parents" of the translations
         for compItem in compItems:
             # Finds title and wordtype inside mainRow and creates description
-            # can have no main_row??
-            mainRow = compItem.select('.main_row')[0]
+            mainRowList = compItem.select('.main_row')
+            if len(mainRowList) == 0: continue;
+            
+            mainRow = mainRowList[0];
 
             mainTitle = mainRow.select('.main_item')[0]
             mainType = mainRow.select('.main_wordtype')
