@@ -1,18 +1,18 @@
 # Classes for scraping
 
 class Description:
-    def __init__(self, title, wordtype):
-        self.title : str = title;
-        self.wordtype : str = wordtype;
+    def __init__(self, title: str, wordtype: str):
+        self.title = title;
+        self.wordtype = wordtype;
 
     def Display(self, titleColor='\033[00m', wordtypeColor='\033[00m', atStart='', atEnd='\n') -> None:
         wordTypeStr = f'{wordtypeColor}({self.wordtype})\033[00m' if self.wordtype != '' else ''
         print(f'{atStart}{titleColor}{self.title}\033[00m {wordTypeStr}', end=atEnd)
 
 class Translation:
-    def __init__(self, description, exampleTexts):
-        self.description : Description = description
-        self.exampleTexts : list[str] = exampleTexts
+    def __init__(self, description: Description, exampleTexts: list[str]):
+        self.description = description
+        self.exampleTexts = exampleTexts
     
     def Display(self) -> None:
         self.description.Display('\033[0;37m', '\033[3;90m', '\n     ')
@@ -27,10 +27,10 @@ class Translation:
         }
 
 class Lemma:
-    def __init__(self, description, translations, lessCommons):
-        self.description : Description = description
-        self.lessCommons : list[Description] = lessCommons
-        self.translations : list[Translation] = translations
+    def __init__(self, description: Description, translations: list[Translation], lessCommons: list[Description]):
+        self.translations  = translations
+        self.description  = description
+        self.lessCommons = lessCommons
     
     def Display(self, fastMode=False) -> None:
         self.description.Display('\033[1;32m', '\033[3;90m', '\n   ', '')
@@ -64,13 +64,13 @@ class Lemma:
         }
 
 class Page:
-    def __init__(self, search, lemmas, srcLanguage, trsLanguage, fastMode):
-        self.srcLanguage : str = srcLanguage
-        self.trsLanguage : str = trsLanguage
-        self.search : str = search
+    def __init__(self, search: str, lemmas: list[Lemma], srcLanguage: str, trsLanguage: str, fastMode: bool):
+        self.srcLanguage = srcLanguage
+        self.trsLanguage = trsLanguage
+        self.search  = search
 
-        self.lemmas : list[Lemma] = lemmas
-        self.fastMode : bool = fastMode
+        self.lemmas  = lemmas
+        self.fastMode  = fastMode
 
     def Dict(self) -> dict:
         lemmasDict = list(map(lambda l: l.Dict(), self.lemmas))

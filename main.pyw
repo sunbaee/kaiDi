@@ -6,15 +6,15 @@ import lxml;
 
 # Importing packages (standard)
 
-import shelve;
 import json;
 import sys;
 
 # Importing modules (local)
 
+from Modules.messages import *;
+from Modules.manager import *;
 from Modules.scrape import *;
 from Modules.parser import *;
-from Modules.messages import *;
 
 # Read-only
 propertyNames = ['sourceLanguage', 'translate', 'domain']
@@ -50,9 +50,8 @@ def SoupConnect(fastMode, search, sourceLang, transLang, dotDomain):
     
     return BeautifulSoup(res.text, 'lxml')
 
-# Used by others
-
-def BSearch(search, dicArray, dicParameter):
+# Used by other functions
+def BSearch(search, dicArray, dicParameter) -> (bool, int):
     # Binary search
 
     # Starting variables
@@ -77,89 +76,22 @@ def BSearch(search, dicArray, dicParameter):
 
     return (False, middle);
 
-def SetProperties(properties, currentConfig):
+def SetProperties(properties: list[list[str]], currentConfig: dict) -> dict:
     temp = currentConfig;
-    for i, prop in enumerate(properties): 
+    for prop in properties: 
         temp[prop[0]] = prop[1]
     
     return temp;
 
 # Final output
-def Output(lemmas, mode):
+def Output(lemmas, mode) -> None:
     for lemma in lemmas:
         lemma.Display(mode);
     
     print();
 
-# Writing/Reading/Displaying files
-def WriteData(section, page):
-    with shelve.open('data.db', writeback=True) as dataFile:
-        if not section in dataFile: dataFile[section] = []
-
-        # Inserts element into data
-        dataFile[section].append(page.Dict());
-
-def GetData(section):
-    with shelve.open('data.db') as dataFile:
-        if not section in dataFile: return [];
-
-        return dataFile[section];
-
-def DisplayData(section):
-    searchList = GetData(section)
-    if len(searchList) <= 0: print(f'\n \033[1;35m°՞(ᗒᗣᗕ)՞° You have no information in "{section}".\033[0m'); return;
-
-    print(f'\n \033[1;35m(≧∇≦) Displaying your "{section}":\033[00m\n')
-
-    # Gets every page dictionary in logs and displays information about that page
-    for i, page in enumerate(searchList):
-        # Makes slashes align after 20 chars, unless the search word has more than 20 chars. (min 2 blank spaces)
-        blankSpaces = ' ' * (max(0, 20 - len(page['search'])) + 2)
-        print(f"   \033[2m{(i + 1):03d} |\033[0m {page['search']}{blankSpaces}\033[2m|\033[0m\033[2m  {page['source']} - {page['translated']}  {'*' if page['fastMode'] else ''}\033[0m")
-
-def MatchData(dataSection, search, sourceLang, transLang, fastMode):
-    for page in GetData(dataSection):
-        if page['search'] == search[0] and page['source'] == sourceLang[1] and page['translated'] == transLang[1] and page['fastMode'] == fastMode:
-            # Transforms json into lemmas array to be displayed:
-
-            search = page['search']
-            source = page['source']
-            translated = page['translated']
-
-            # Creates lemmas with dictionary values
-            lemmas = []
-            for lemma in page['lemmas']:
-                curDesc = Description(lemma['description']['title'], lemma['description']['wordtype'])
-                
-                translations = []
-                for trans in lemma['translations']:
-                    transDesc = Description(trans['description']['title'], trans['description']['wordtype'])
-                    exampleTexts = trans['examples']
-                    translations.append(Translation(transDesc, exampleTexts))
-
-                lessCommons = []
-                for lc in lemma['lessCommons']:
-                    lessCommons.append(Description(lc['title'], lc['wordtype']))
-
-                lemmas.append(Lemma(curDesc, translations, lessCommons))
-
-            # Displays and returns true
-            Output(lemmas, page['fastMode'])
-            return (True, lemmas)
-    
-    return (False, [])
-
-def OpenJSON(fileName):
-    try: 
-        with open(fileName, "r") as file:
-            return json.load(file);
-    except:
-        print('\n \033[1;35m(˶˃⤙˂˶)\033[0m To start translating, update the translation');
-        print('         config using \033[1mkdi -u \033[0m.')
-        ExitMSG('        \033[1mExample:\033[0m \033[3mkdi -u en:fr:.com\033[0m')
-
 # Receives language or language code, checks if it exists and returns the correct language with its iso639 language code.
-def CheckLanguage(language):
+def CheckLanguage(language) -> list[str]:
     langFile = OpenJSON('languages.json')
 
     # * inDex is the index inside a specific language (0: language name, 1: language code)
@@ -185,7 +117,6 @@ def CheckLanguage(language):
                     "\n  \033[3mhttps://en.wikipedia.org/wiki/List_of_ISO_639_language_codes\033[00m")
 
 # Main
-
 def Main() -> None:
     # Defining variables used in most of main
     search = []
@@ -251,7 +182,7 @@ def Main() -> None:
                         with open('config.json', "r+") as file:
                             config = json.load(file)
 
-                            # Writes all properties and displays changes
+                            # Writes all properties
                             config = SetProperties(properties, config);
 
                             file.seek(0)
@@ -264,7 +195,7 @@ def Main() -> None:
                             
                             nullConfig = {"sourceLanguage": "", "translate": "", "domain": "", "fastTranslation": False}
 
-                            print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The configuration was set successfully:')
+                            print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The configuration was set successfully.')
                             config = SetProperties(properties, nullConfig);
 
                             json.dump(config, file); file.truncate();
@@ -304,7 +235,6 @@ def Main() -> None:
 
                         # Toogle fast translation (True / False)
                         config['fastTranslation'] = not config['fastTranslation']
-                        print(f' \n\033[1;33m⎚⩊⎚ -✧\033[0m  Fast translation was set to \033[1m{config["fastTranslation"]}\033[0m.')
                         
                         file.seek(0)
                         json.dump(config, file)
@@ -356,7 +286,9 @@ def Main() -> None:
         for compItem in compItems:
             # Finds title and wordtype inside mainRow and creates description
             mainRowList = compItem.select('.main_row')
-            if len(mainRowList) == 0: continue;
+            if len(mainRowList) == 0:
+                if len(compItems) > 1: continue; 
+                ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
             
             mainRow = mainRowList[0];
 
