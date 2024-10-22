@@ -1,3 +1,5 @@
+# Some messages
+
 def Help() -> None:
     print("\n \033[1mDescription\033[0m: A script that translates things directly from the terminal.")
     print("              (˶˃ ᵕ ˂˶) .ᐟ.ᐟ \n")
