@@ -17,7 +17,9 @@ class Translation:
     def Display(self) -> None:
         self.description.Display('\033[0;37m', '\033[3;90m', '\n     ')
 
-        for example in self.exampleTexts:
+        for i, example in enumerate(self.exampleTexts):
+            if i % 2 == 0 and i > 0: print();
+
             print(f'       \033[0;34m{example.strip()}\033[00m')
 
     def Dict(self) -> dict:
@@ -38,15 +40,16 @@ class Lemma:
         for info in self.translations:
             info.Display()
         
-        if len(self.lessCommons) <= 0: return
+        if len(self.lessCommons) <= 0: return;
         
         print('\n     ', end='') if fastMode else print('\n   \033[3;32mLess common: \033[00m\n     ', end='');
         for i, lessCommon in enumerate(self.lessCommons):
-            if i == len(self.lessCommons) - 1:
-                lessCommon.Display('\033[0;37m', '\033[3;90m', '')
-                continue;
+            titleColor, wordtypeColor = '\033[0;37m', '\033[3;90m';
+            atEnd = ' - ';
 
-            lessCommon.Display('\033[0;37m', '\033[3;90m', '', ' - ')
+            if i == len(self.lessCommons) - 1 or (i + 1) % 3 == 0: atEnd = '\n     ';
+
+            lessCommon.Display(titleColor, wordtypeColor, atEnd=atEnd)
 
     def Dict(self) -> dict:
         transDictArr = []
@@ -82,3 +85,9 @@ class Page:
             "translated": self.trsLanguage,
             "fastMode": self.fastMode
         }
+
+    def Display(self) -> None:
+        for lemma in self.lemmas:
+            lemma.Display(self.fastMode);
+    
+        print();

@@ -11,7 +11,7 @@ import sys;
 
 # Importing modules (local)
 
-from Modules.messages import *;
+from Modules.display import *;
 from Modules.manager import *;
 from Modules.scrape import *;
 from Modules.parser import *;
@@ -51,9 +51,9 @@ def SoupConnect(fastMode, search, sourceLang, transLang, dotDomain):
     return BeautifulSoup(res.text, 'lxml')
 
 # Used by other functions
-def BSearch(search, dicArray, dicParameter) -> (bool, int):
-    # Binary search
 
+# Binary search
+def BSearch(search, dicArray, dicParameter) -> (bool, int):
     # Starting variables
     start = 0
     middle = 0
@@ -82,13 +82,6 @@ def SetProperties(properties: list[list[str]], currentConfig: dict) -> dict:
         temp[prop[0]] = prop[1]
     
     return temp;
-
-# Final output
-def Output(lemmas, mode) -> None:
-    for lemma in lemmas:
-        lemma.Display(mode);
-    
-    print();
 
 # Receives language or language code, checks if it exists and returns the correct language with its iso639 language code.
 def CheckLanguage(language) -> list[str]:
@@ -119,31 +112,37 @@ def CheckLanguage(language) -> list[str]:
 # Main
 def Main() -> None:
     # Defining variables used in most of main
+    saveTranslation = usingOptions = False;
     search = []
-    saveTranslation = False
-    usingOptions = False
 
     # Checks arguments
-    if len(sys.argv) <= 1: Help()
+    if len(sys.argv) <= 1: Help();
 
     # Command line options
     for i, argument in enumerate(sys.argv[1:]):
         # Get options
         if argument[0] == '-' and len(argument) >= 2:
-            usingOptions = True
+            usingOptions = True;
             match argument[1]:
+                # Display options
+
                 # Shows help message
-                case 'h': Help()
+                case 'h': Help();
                 # Shows log of translations
                 case 'l': 
                     DisplayData('logs'); DisplayData('saved');
                     print('\n\033[1m * :\033[0m Searched with \033[1mfastmode\033[0m\n'); exit();
+                # Display options from the configuration file
+                case 'i': DisplayConfig();
+                
+                # Managing files
+
                 # Updates config file
                 case 'u':
                     # Looks for option arguments
                     if len(sys.argv) <= i + 2: MissingArgument('option argument')
 
-                    properties = []                    
+                    properties = []
                     # Loops through option arguments
                     for optArg in sys.argv[i+2:]:
                         if optArg[0] == '-': break;
@@ -156,9 +155,9 @@ def Main() -> None:
                             # Creates list with booleans depending 
                             # if the propertyName matches one of the strings in propertyNames,
                             # if no string matches the propertyName, then the propertyName inserted is invalid.
-                            correctStr = False
+                            correctStr = False;
                             for k in list(map(lambda x: prop[0] == x, propertyNames)):
-                                if k: correctStr = True
+                                if k: correctStr = True;
                             if not correctStr: ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Invalid config option name. Use -d to see options names.\033[00m")
                             
                             properties.append(prop)
@@ -201,16 +200,6 @@ def Main() -> None:
                             json.dump(config, file); file.truncate();
                     
                     if (len(search) == 0): print(); exit()
-                # Display options from the configuration file
-                case 'i':
-                    config = OpenJSON('config.json')
-                    print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[1mDisplaying useful information:\033[00m\n')
-                    print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0]} \033[2m({config['sourceLanguage'][1]})\033[00m')
-                    print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} \033[2m({config['translate'][1]})\033[00m\n')
-                    print(  f' \033[1;35mdomain:\033[00m {config['domain']}')
-                    print(f'\n \033[1m* Fast Mode:\033[00m {config['fastTranslation']}\n')
-
-                    exit()
                 # Clears logs or saved logs
                 case 'c':
                     section = ''
@@ -224,21 +213,12 @@ def Main() -> None:
 
                         if section == '': ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Invalid section name. The available sections are 'logs' and 'saved'.\033[00m")
 
-                    with shelve.open('data.db') as dataFile: dataFile[section] = []
+                    ClearData(section);
                     ExitMSG(f" \033[1;34mᕙ( •̀ ᗜ •́ )ᕗ\033[0m  The section \033[3m'{section}'\033[0m was cleared.")
+                # Toogle fast translation
+                case 'f': ToogleFast();
                 # Saves translation to be used later
                 case 's': saveTranslation = True;
-                # Toogle fast translation
-                case 'f': 
-                    with open('config.json', "r+") as file:
-                        config = json.load(file)
-
-                        # Toogle fast translation (True / False)
-                        config['fastTranslation'] = not config['fastTranslation']
-                        
-                        file.seek(0)
-                        json.dump(config, file)
-                        file.truncate()
                 # Default message
                 case _: ExitMSG("\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m")
 
@@ -246,7 +226,7 @@ def Main() -> None:
         if not usingOptions: search.append(argument);
 
     # If there's no search, creates new line and exit()
-    if (len(search) == 0): print(); exit()
+    if (len(search) == 0): print(); exit();
 
     # Get values from json file
     config = OpenJSON('config.json')
@@ -254,8 +234,8 @@ def Main() -> None:
     sourceLang = config['sourceLanguage']
     transLang = config['translate']
 
-    dotDomain = config['domain']
     fastMode = config['fastTranslation']
+    dotDomain = config['domain']
 
     # Checks if translations is saved or is in the logs (loads faster, no need to internet connection)
     logMatch = MatchData('logs',  search, sourceLang, transLang, fastMode);
@@ -271,66 +251,17 @@ def Main() -> None:
     # Gets linguee html 
     soup = SoupConnect(fastMode, search, sourceLang, transLang, dotDomain);
 
-    # Initialize lemmas
-    lemmaInfos = []
-
-    if fastMode: 
-        # Gets "lemmas" (are called completion items in html)
-        compItems = soup.select('.autocompletion_item');
-
-        # Exits if doesnt find elements
-        if len(compItems) <= 0:
-            ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
-        
-        # Finds all "parents" of the translations
-        for compItem in compItems:
-            # Finds title and wordtype inside mainRow and creates description
-            mainRowList = compItem.select('.main_row')
-            if len(mainRowList) == 0:
-                if len(compItems) > 1: continue; 
-                ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
-            
-            mainRow = mainRowList[0];
-
-            mainTitle = mainRow.select('.main_item')[0]
-            mainType = mainRow.select('.main_wordtype')
-
-            mainDescription = Description(mainTitle.text, '' if len(mainType) <= 0 else mainType[0].text)
-
-            # Finds all translations of the compItem
-            transRow = compItem.select('.translation_row')[0]
-            transItems = transRow.select('.translation_item')
-        
-            # Gets all translations from the "parent" (compItem)
-            translations = []
-            for item in transItems:
-                # Gets text and filters it into array with title and wordtype of translation
-                itemArr = item.text.replace('\r', '').replace('·', '').split('\n')
-
-                # Creates a description from tags and appends it to translations array.
-                translations.append(Description(itemArr[1].strip(), itemArr[2].strip()))
-
-            # Uses translations as less commons (because they are just descriptions), creates lemma and appends it to lemmaInfos to be displayed and saved
-            lemmaInfos.append(Lemma(mainDescription, [], translations))
-    else:
-        # Gets lemmas (chunks of text)
-        lemmas = soup.select('.exact > .lemma:not(.singleline) > div')
-
-        # If there's no titles, no results where found
-        if len(lemmas) <= 0:
-            ExitMSG("\033[1;31m( ˶•ᴖ•) !! No results where found. \033[00m")
-
-        # Stores lemmas
-        lemmaInfos = list(map(GetLemma, lemmas))
+    lemmaInfos = GetInfo(soup, fastMode);
 
     # Displays result
-    Output(lemmaInfos, fastMode)
+    translationPage = Page(search[0], lemmaInfos, sourceLang[1], transLang[1], fastMode);
+    translationPage.Display();
 
     # Saves to log history
-    WriteData('logs', Page(search[0], lemmaInfos, sourceLang[1], transLang[1], fastMode))
+    WriteData('logs', translationPage);
 
     # Saves to saved section (-s option)
-    if saveTranslation: WriteData('saved', Page(search[0], lemmaInfos, sourceLang[1], transLang[1], fastMode))
+    if saveTranslation: WriteData('saved', translationPage);
 
 if __name__ == "__main__":
     Main();
