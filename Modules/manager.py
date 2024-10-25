@@ -2,7 +2,7 @@ import shelve;
 import json;
 
 from Modules.scrape import Description, Translation, Lemma, Page;
-from Modules.message import ExitMSG;
+from Modules.display import ExitMSG;
 
 # Manages Writing/Reading/Getting files
 
