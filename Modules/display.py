@@ -1,4 +1,4 @@
-import Modules.manager as Manager;
+from Modules.manager import OpenJSON, GetData;
 
 # Some messages
 
@@ -40,7 +40,7 @@ def MissingArgument(customMessage='argument') -> None:
     ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ No {customMessage} supplied.\033[00m");
 
 def DisplayConfig() -> None:
-    config = Manager.OpenJSON('config.json')
+    config = OpenJSON('config.json')
     print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[1mDisplaying useful information:\033[00m\n')
     print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0]} \033[2m({config['sourceLanguage'][1]})\033[00m')
     print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} \033[2m({config['translate'][1]})\033[00m\n')
@@ -50,7 +50,7 @@ def DisplayConfig() -> None:
     exit();
 
 def DisplayData(section: str) -> None:
-    searchList = Manager.GetData(section)
+    searchList = GetData(section)
     if len(searchList) <= 0: print(f'\n \033[1;35m°՞(ᗒᗣᗕ)՞° You have no information in "{section}".\033[0m'); return;
 
     print(f'\n \033[1;35m(≧∇≦) Displaying your "{section}":\033[00m\n')
