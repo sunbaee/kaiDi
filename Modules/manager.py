@@ -81,3 +81,25 @@ def ToogleFast() -> None:
         file.seek(0)
         json.dump(config, file)
         file.truncate()
+
+def DisplayConfig() -> None:
+    config = OpenJSON('config.json')
+    print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[1mDisplaying useful information:\033[00m\n')
+    print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0]} \033[2m({config['sourceLanguage'][1]})\033[00m')
+    print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} \033[2m({config['translate'][1]})\033[00m\n')
+    print(  f' \033[1;35mdomain:\033[00m {config['domain']}')
+    print(f'\n \033[1m* Fast Mode:\033[00m {config['fastTranslation']}\n')
+
+    exit();
+
+def DisplayData(section: str) -> None:
+    searchList = GetData(section)
+    if len(searchList) <= 0: print(f'\n \033[1;35m°՞(ᗒᗣᗕ)՞° You have no information in "{section}".\033[0m'); return;
+
+    print(f'\n \033[1;35m(≧∇≦) Displaying your "{section}":\033[00m\n')
+
+    # Gets every page dictionary in logs and displays information about that page
+    for i, page in enumerate(searchList):
+        # Makes slashes align after 20 chars, unless the search word has more than 20 chars. (min 2 blank spaces)
+        blankSpaces = ' ' * (max(0, 20 - len(page['search'])) + 2)
+        print(f"   \033[2m{(i + 1):03d} |\033[0m {page['search']}{blankSpaces}\033[2m|\033[0m\033[2m  {page['source']} - {page['translated']}  {'*' if page['fastMode'] else ''}\033[0m")
