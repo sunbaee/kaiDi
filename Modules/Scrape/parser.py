@@ -1,5 +1,5 @@
-from Modules.scrape import Description, Translation, Lemma;
-from Modules.display import ExitMSG;
+from Modules.Scrape.Scraper import Description, Translation, Lemma;
+from Modules.Display.display import ExitMSG;
 
 # Functions that parse html elements into scraping objects of the classes from scrape
 

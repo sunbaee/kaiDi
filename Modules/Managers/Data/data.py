@@ -1,12 +1,9 @@
 import shelve;
-import json;
 
-from Modules.scrape import Description, Translation, Lemma, Page;
-from Modules.display import ExitMSG;
+from Modules.Scrape.Scraper import Description, Translation, Lemma, Page;
+from Modules.Display.display import ExitMSG;
 
 # Manages Writing/Reading/Getting files
-
-# > shelve data manager
 
 # Writes full page search in a section
 def WriteData(section: str, page: Page) -> None:
@@ -59,38 +56,20 @@ def MatchData(dataSection: str, search: list[str], sourceLang: list[str], transL
 def ClearData(section: str) -> None:
     with shelve.open('data.db') as dataFile: dataFile[section] = [];
 
-# > config file manager
+def ClearLog(args, index) -> None:
+    section = ''
+    # Checks if theres no option argument (default to 'logs')
+    if len(args) <= index + 1 or args[index + 1][0] == '-': section = 'logs'
+    else: 
+        # Checks if option argument is in logs or saved
+        possibleSections = ['logs', 'saved'];
+        for sec in possibleSections: 
+            if args[index + 1] == sec: section = sec; break;
 
-def OpenJSON(fileName) -> dict:
-    try: 
-        with open(fileName, "r") as file:
-            return json.load(file);
-    except:
-        print('\n \033[1;35m(˶˃⤙˂˶)\033[0m To start translating, update the translation');
-        print('         config using \033[1mkdi -u \033[0m.')
-        ExitMSG('        \033[1mExample:\033[0m \033[3mkdi -u en:fr:.com\033[0m')
+        if section == '': ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Invalid section name. The available sections are 'logs' and 'saved'.\033[00m")
 
-# Toogles fast translation
-def ToogleFast() -> None:
-    with open('config.json', "r+") as file:
-        config = json.load(file)
-
-        # Toogle fast translation (True / False)
-        config['fastTranslation'] = not config['fastTranslation']
-        
-        file.seek(0)
-        json.dump(config, file)
-        file.truncate()
-
-def DisplayConfig() -> None:
-    config = OpenJSON('config.json')
-    print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[1mDisplaying useful information:\033[00m\n')
-    print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0]} \033[2m({config['sourceLanguage'][1]})\033[00m')
-    print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} \033[2m({config['translate'][1]})\033[00m\n')
-    print(  f' \033[1;35mdomain:\033[00m {config['domain']}')
-    print(f'\n \033[1m* Fast Mode:\033[00m {config['fastTranslation']}\n')
-
-    exit();
+    ClearData(section);
+    ExitMSG(f" \033[1;34mᕙ( •̀ ᗜ •́ )ᕗ\033[0m  The section \033[3m'{section}'\033[0m was cleared.")
 
 def DisplayData(section: str) -> None:
     searchList = GetData(section)
