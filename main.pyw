@@ -1,9 +1,3 @@
-# Importing packages (pip)
-
-from bs4 import BeautifulSoup; 
-import requests; 
-import lxml;
-
 # Importing packages (standard)
 
 import json;
@@ -11,6 +5,7 @@ import sys;
 
 # Importing modules (local)
 
+from Modules.Translator import Translator;
 from Modules.display import *;
 from Modules.manager import *;
 from Modules.scrape import *;
@@ -18,37 +13,6 @@ from Modules.parser import *;
 
 # Read-only
 propertyNames = ['sourceLanguage', 'translate', 'domain']
-
-# Custom exception
-class StatusException(Exception):
-    pass;
-
-# Connects to url
-def SoupConnect(fastMode, search, sourceLang, transLang, dotDomain):
-    # Changes target depending on fastMode
-    urlParameters = f'qe={search[0]}&source=auto&cw=980&ch=919&as=shownOnStart' if fastMode else f'source=auto&query={search[0]}';
-
-    # linguee url
-    url = f'https://www.linguee{dotDomain}/{sourceLang[0]}-{transLang[0]}/search?{urlParameters}'
-    
-    # Handle requests and errors
-    try: 
-        res = requests.get(url)
-
-        if res.status_code != 200: raise StatusException(res.status_code)
-    except requests.ConnectionError as error:
-        ExitMSG(f'\033[1;31m (っ◞‸◟ c) An internet connection error ocurred.\033[0m')
-    except requests.exceptions.RequestException as error:
-        ExitMSG(f'\033[1;31m (っ◞‸◟ c) An error ocurred:\033[00m\n\n   {error}')
-    except StatusException as error:
-        print(f'\n \033[1;31m(－－ ; Exception\033[00m: Unexpected HTML status code: \033[1;35mCODE {error}\033[00m')
-        if str(error) == '429': 
-            print('\n \033[3;90mToo many requests. Try again later...\033[0m')
-            if not fastMode: print(' \033[3;90mOr you can enable fast-translation by using the -f option. \033[00m')
-        print()
-        exit()
-    
-    return BeautifulSoup(res.text, 'lxml')
 
 # Used by other functions
 
@@ -92,11 +56,9 @@ def CheckLanguage(language) -> list[str]:
     # Checks if the user inserted an abbreviation or 
     # a language name and changes inDex and languages variables accordingly
     if len(language) == 2:
-        languages = langFile['sortedCodes']
-        inDex = 1
+        languages = langFile['sortedCodes']; inDex = 1
     else:
-        languages = langFile['sortedLanguages']
-        inDex = 0;
+        languages = langFile['sortedLanguages']; inDex = 0;
 
     # Binary search to find if the language is in the languages.json file
     searchResult = BSearch(language, languages, inDex)
@@ -248,10 +210,8 @@ def Main() -> None:
 
     if savMatch[0]: exit();
 
-    # Gets linguee html 
-    soup = SoupConnect(fastMode, search, sourceLang, transLang, dotDomain);
-
-    lemmaInfos = GetInfo(soup, fastMode);
+    translator = Translator(sourceLang, transLang, dotDomain, fastMode);
+    lemmaInfos = translator.Translate(search);
 
     # Displays result
     translationPage = Page(search[0], lemmaInfos, sourceLang[1], transLang[1], fastMode);
