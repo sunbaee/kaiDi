@@ -9,6 +9,9 @@ class ArgumentResponse:
         self.saveTranslation = saveTranslation;
         self.search = search;
 
+def __InvalidOption(argument):
+    ExitMSG(f"\033[1;31m /ᐠ - ˕ -マ {argument} is an invalid option. Use -h option for help. \033[00m");
+
 def CheckArguments(args: list[str]) -> ArgumentResponse:
     # Variables to be returned
     usingOptions = saveTranslation = False;
@@ -17,7 +20,9 @@ def CheckArguments(args: list[str]) -> ArgumentResponse:
     # Command line options
     for i, argument in enumerate(args):
         # Get options
-        if argument[0] == '-' and len(argument) >= 2:
+        if argument[0] == '-':
+            if len(argument) != 2: __InvalidOption(argument);
+            
             usingOptions = True;
             match argument[1]:
                 # Display options
@@ -42,7 +47,7 @@ def CheckArguments(args: list[str]) -> ArgumentResponse:
                 # Saves translation to be used later
                 case 's': saveTranslation = True;
                 # Default message
-                case _: ExitMSG("\033[1;31m /ᐠ - ˕ -マ Invalid option. Use -h option for help. \033[00m");
+                case _: __InvalidOption(argument);
 
         # Get all arguments before the first option (all text to be translated)
         if not usingOptions: search.append(argument);
