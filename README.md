@@ -11,7 +11,7 @@ It has some extra functions such as:
 
 <br>
 
-_The version of python used was python 3.12._
+The only dependency needed for this app is docker. See https://www.docker.com/ if you don't have docker installed yet.
 
 <div align="right">
 
