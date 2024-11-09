@@ -69,7 +69,7 @@ def ClearLog(args, index) -> None:
         if section == '': ExitMSG(f"\033[1;31m ୧(๑•̀ᗝ•́)૭ Invalid section name. The available sections are 'logs' and 'saved'.\033[00m")
 
     ClearData(section);
-    ExitMSG(f" \033[1;34mᕙ( •̀ ᗜ •́ )ᕗ\033[0m  The section \033[3m'{section}'\033[0m was cleared.")
+    ExitMSG(f" \033[1;34mᕙ( •̀ ᗜ •́ )ᕗ\033[0m  The section \033[3m{section}\033[0m was cleared.")
 
 def DisplayData(section: str) -> None:
     searchList = GetData(section)
