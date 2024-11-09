@@ -7,7 +7,7 @@ from Modules.Display.display import ExitMSG;
 
 # Writes full page search in a section
 def WriteData(section: str, page: Page) -> None:
-    with shelve.open('data.db', writeback=True) as dataFile:
+    with shelve.open('Data/data.db', writeback=True) as dataFile:
         if not section in dataFile: dataFile[section] = []
 
         # Inserts element into data
@@ -15,7 +15,7 @@ def WriteData(section: str, page: Page) -> None:
 
 # Gets data from a section
 def GetData(section: str) -> list[Page]:
-    with shelve.open('data.db') as dataFile:
+    with shelve.open('Data/data.db') as dataFile:
         if not section in dataFile: return [];
 
         return dataFile[section];
@@ -54,7 +54,7 @@ def MatchData(dataSection: str, search: list[str], sourceLang: list[str], transL
     return (False, [])
 
 def ClearData(section: str) -> None:
-    with shelve.open('data.db') as dataFile: dataFile[section] = [];
+    with shelve.open('Data/data.db') as dataFile: dataFile[section] = [];
 
 def ClearLog(args, index) -> None:
     section = ''

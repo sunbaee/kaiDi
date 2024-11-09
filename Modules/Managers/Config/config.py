@@ -61,7 +61,7 @@ def UpdateConfig(args, currentIndex, search):
 
     try:
         # Updates config file 
-        with open('config.json', "r+") as file:
+        with open('Data/config.json', "r+") as file:
             config = json.load(file)
 
             # Writes all properties
@@ -75,7 +75,7 @@ def UpdateConfig(args, currentIndex, search):
         if len(properties) < 3: ExitMSG(' \033[1;31m( ｡ •`ᴖ´• ｡)\033[0m You need to set all config options: \033[3msourceLanguage, translate and domain.\033[0m')
 
         # Creates config file if there's no config file
-        with open('config.json', 'w+') as file:
+        with open('Data/config.json', 'w+') as file:
             nullConfig = {"sourceLanguage": "", "translate": "", "domain": "", "fastTranslation": False}
 
             print(f'\n \033[1;33m(๑•̀ㅂ•́)ง✧\033[00m The configuration was set successfully.')
@@ -87,7 +87,7 @@ def UpdateConfig(args, currentIndex, search):
 
 # Toogles fast translation
 def ToogleFast() -> None:
-    with open('config.json', "r+") as file:
+    with open('Data/config.json', "r+") as file:
         config = json.load(file)
 
         # Toogle fast translation (True / False)
@@ -98,7 +98,7 @@ def ToogleFast() -> None:
         file.truncate()
 
 def DisplayConfig() -> None:
-    config = OpenJSON('config.json')
+    config = OpenJSON('Data/config.json')
     print(f'\n \033[1m(˶ ˆ ꒳ˆ˵) \033[0m\033[1mDisplaying useful information:\033[00m\n')
     print(  f' \033[1;33msourceLanguage:\033[00m {config['sourceLanguage'][0]} \033[2m({config['sourceLanguage'][1]})\033[00m')
     print(  f' \033[1;33mtranslate:\033[00m {config['translate'][0]} \033[2m({config['translate'][1]})\033[00m\n')

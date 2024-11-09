@@ -24,7 +24,7 @@ def Main() -> None:
     if (len(search) == 0): print(); exit();
 
     # Get values from json file
-    config = OpenJSON('config.json')
+    config = OpenJSON('Data/config.json')
 
     sourceLang = config['sourceLanguage']
     transLang = config['translate']
