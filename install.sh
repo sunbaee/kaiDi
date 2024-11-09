@@ -25,6 +25,10 @@ cd /usr/local/bin;
 # Creating executable file to open the program in the terminal
 echo "#!/bin/bash"                                                     | cat  > kdi;
 echo                                                                   | cat >> kdi;
+echo 'if ! pgrep -x "docker" > /dev/null; then'                        | cat >> kdi;
+echo '	sudo systemctl start docker;'				       | cat >> kdi;
+echo 'fi;'							       | cat >> kdi;
+echo 								       | cat >> kdi;
 echo 'docker run --rm -v kaidi-data:/usr/src/app/Data kaidi-docker $@' | cat >> kdi;
 
 chmod +x kdi;
