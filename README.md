@@ -11,7 +11,7 @@ It has some extra functions such as:
 
 <br>
 
-The only dependency needed for this app is docker. See https://www.docker.com/ if you don't have docker installed yet.
+The only dependency needed for this app is docker. See the [docker](https://www.docker.com) website if you don't have docker installed yet.
 
 <div align="right">
 
