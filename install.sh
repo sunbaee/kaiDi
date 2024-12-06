@@ -10,9 +10,9 @@ if ! command -v "docker" 2>&1 > /dev/null; then
 fi
 
 # Checks if docker daemon is running and starts it if it's not.
-if ! pgrep -x "docker" > /dev/null; then
-    sudo systemctl start docker;
-fi
+if ! systemctl is-active --quiet "docker" > /dev/null; then
+    sudo systemctl start docker
+fi;
 
 docker build -t kaidi-docker . 
 
