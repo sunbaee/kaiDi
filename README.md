@@ -54,7 +54,7 @@ kdi -l                # displays log.
   
   2. **Install the program**:
       <details>
-      <summary>Linux</summary>
+      <summary>Linux / WSL</summary>
         
       >
       > **Run this command to install:**
@@ -93,13 +93,6 @@ kdi -l                # displays log.
       > </details> 
       >  
       
-      </details>
-
-      <details>
-        <summary>Windows</summary>
-
-        > I will write the rest later. :0
-        > 
       </details>
 <br>
 
